@@ -8,7 +8,8 @@
 # C compiler & Tools
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
-LD = arm-none-eabi-ld
+LD = arm-none-eabi-gcc
+#LD = arm-none-eabi-ld
 OBJDUMP = arm-none-eabi-objdump
 OBJCOPY = arm-none-eabi-objcopy
 NM = arm-none-eabi-nm
@@ -20,11 +21,11 @@ SRCDIR = srcs
 BUILDDIR = build
 
 # Compiler flags
-CFLAGS = -O0 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
+CFLAGS = -O3 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
 #CFLAGS = -O0 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7-a -mtune=cortex-a7 -c
-#LDFLAGS = --no-undefined -T kernel.ld
-LDFLAGS = -nostartfiles -T kernel.ld
-ASFLAGS = -I $(SRCDIR)
+LDFLAGS = -Wno-undef -nostartfiles -T kernel.ld
+#LDFLAGS = -Wl,-verbose
+ASFLAGS = -mfpu=vfp -I $(SRCDIR)
 
 # The name of the output file to generate.
 TARGET = kernel.img
@@ -56,7 +57,7 @@ $(TARGET) : $(BUILDDIR)/kernel.elf
 	
 # Rule to make the kernel.elf file.
 $(BUILDDIR)/kernel.elf : $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $(BUILDDIR)kernel.elf
+	$(LD) $(LDFLAGS) $(OBJECTS) -o $(BUILDDIR)/kernel.elf
 
 # Rule to make the object files for C sources.
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(BUILDDIR)

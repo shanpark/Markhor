@@ -1,3 +1,9 @@
+# Kernel Image
+build/
+kernel.img
+kernel.disasm
+kernel.nm
+
 # Prerequisites
 *.d
 
