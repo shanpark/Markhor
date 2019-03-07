@@ -41,9 +41,9 @@
 
 typedef Uint32 GpioRegister;
 
-int GpioSelectFunction(Uint32 pin, Uint32 func);
-int GpioSetOutputPin(Uint32 pin);
-int GpioClearOutputPin(Uint32 pin);
-int GpioGetPinValue(Uint32 pin);
+extern int GpioSelectFunction(Uint32 pin, Uint32 func);
+extern int GpioSetOutputPin(Uint32 pin);
+extern int GpioClearOutputPin(Uint32 pin);
+extern int GpioGetPinValue(Uint32 pin);
 
 #endif /* __GPIO_H */

@@ -5,7 +5,7 @@
    notice and this notice are preserved.  */
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(main)
+ENTRY(_start)
 SEARCH_DIR("=/tmp/jenkins-GCC-8-build-toolchain-mac_cluster-128_20181216_1544945247/install-native/arm-none-eabi/lib"); SEARCH_DIR("=/usr/local/lib"); SEARCH_DIR("=/lib"); SEARCH_DIR("=/usr/lib");
 SECTIONS
 {

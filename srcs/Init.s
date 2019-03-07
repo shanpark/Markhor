@@ -16,12 +16,10 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Gpio.h"
+.section ".init"
 
-int Markhor(void) {
+.global _start
 
-    GpioSelectFunction(16, 1);
-    GpioClearOutputPin(16);
-
-    return 0;
-}
+_start:
+    mov     sp, #0x8000
+    b       StartUp

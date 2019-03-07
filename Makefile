@@ -21,7 +21,7 @@ SRCDIR = srcs
 BUILDDIR = build
 
 # Compiler flags
-CFLAGS = -O3 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
+CFLAGS = -O2 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
 #CFLAGS = -O0 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7-a -mtune=cortex-a7 -c
 LDFLAGS = -Wno-undef -nostartfiles -T kernel.ld
 #LDFLAGS = -Wl,-verbose
