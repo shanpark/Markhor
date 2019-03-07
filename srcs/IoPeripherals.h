@@ -16,15 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Gpio.h"
+#ifndef __IO_PERIPHERALS_H
+#define __IO_PERIPHERALS_H
 
-__attribute__((naked)) int main(void) {
+#define IO_PERIPHERALS_BASE 0x20000000UL
 
-    GpioSelectFunction(16, 1);
-    GpioClearOutputPin(16);
-
-    while (1)
-        ;
-
-    return 0;
-}
+#endif /* __IO_PERIPHERALS_H */
