@@ -18,10 +18,21 @@
 
 #include "Gpio.h"
 
+#define NOP() asm("nop")
+
 int Markhor(void) {
 
     GpioSelectFunction(16, 1);
-    GpioClearOutputPin(16);
+
+    while (1) {
+        if (GpioGetPinValue(16) == GPV_HI)
+            GpioClearOutputPin(16);
+        else
+            GpioSetOutputPin(16);
+
+        for (int inx = 0 ; inx < 500000 ; inx++)
+            NOP();
+    }
 
     return 0;
 }

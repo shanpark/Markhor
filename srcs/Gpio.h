@@ -41,9 +41,26 @@
 
 typedef Uint32 GpioRegister;
 
-extern int GpioSelectFunction(Uint32 pin, Uint32 func);
+typedef enum {
+    GPF_INPUT = 0,
+    GPF_OUTPUT = 1,
+    GPF_ALT0 = 4,
+    GPF_ALT1 = 5,
+    GPF_ALT2 = 6,
+    GPF_ALT3 = 7,
+    GPF_ALT4 = 3,
+    GPF_ALT5 = 2
+} PinFunction;
+
+typedef enum {
+    GPV_ERR = -1,
+    GPV_LO = 0,
+    GPV_HI = 1
+} PinValue;
+
+extern int GpioSelectFunction(Uint32 pin, PinFunction func);
 extern int GpioSetOutputPin(Uint32 pin);
 extern int GpioClearOutputPin(Uint32 pin);
-extern int GpioGetPinValue(Uint32 pin);
+extern PinValue GpioGetPinValue(Uint32 pin);
 
 #endif /* __GPIO_H */
