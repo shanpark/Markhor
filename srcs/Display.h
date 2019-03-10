@@ -16,24 +16,26 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-extern int __bss_start__;
-extern int __bss_end__;
+#ifndef __DISPLAY_H
+#define __DISPLAY_H
 
-extern void Markhor(void);
+#include "MarkhorTypes.h"
 
-#define NOP() asm("nop")
+typedef struct {
+    Address frameBuffer;
+    Address frameBufferEnd;
+    Uint32 physicalWidth;
+    Uint32 physicalHeight;
+    Uint32 virtualWidth;
+    Uint32 virtualHeight;
+    Uint32 bpp;
+    Uint32 pitch;
+} DisplayInfo;
 
-__attribute__((naked))  void StartUp(void) {
-    int* pos = &__bss_start__;
-    int* end = &__bss_end__;
+extern DisplayInfo displayInfo;
 
-    /* clear .bss section */
-    while (pos < end)
-        *pos++ = 0;
+extern int setDisplay(Uint32 width, Uint32 height, Uint32 bpp);
+extern void setPixel(Uint32 x, Uint32 y, Uint32 color);
+extern void putChar(Uint32 x, Uint32 y, Uint32 ascii);
 
-    /* kernel main */
-    Markhor();
-
-    while (1)
-        NOP();
-}
+#endif /* __DISPLAY_H */
