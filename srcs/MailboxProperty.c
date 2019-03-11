@@ -24,24 +24,25 @@ Uint32 bufferForMailbox[1024] __attribute__((aligned(16)));
 Uint32 getFirmwareRevision() {
     int index = 0;
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = RequestCode; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // GetFirmwareRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetFirmwareRevision, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetFirmwareRevision, 4, 0, 0);
 
     // End tag
-    mbpb->tags[index] = End;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & ResponseCodeBit) && ((mbpb->code & ResponseCodeErrorBit) == 0)) {
-        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[0]));
-        if (tag->id == GetFirmwareRevision)
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetFirmwareRevision) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
             return tag->uint32Values[0];
     }
 
@@ -51,24 +52,25 @@ Uint32 getFirmwareRevision() {
 Uint32 getBoardModel() {
     int index = 0;
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = RequestCode; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // GetBoardModel tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetBoardModel, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardModel, 4, 0, 0);
 
     // End tag
-    mbpb->tags[index] = End;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & ResponseCodeBit) && ((mbpb->code & ResponseCodeErrorBit) == 0)) {
-        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[0]));
-        if (tag->id == GetBoardModel)
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetBoardModel) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
             return tag->uint32Values[0];
     }
 
@@ -78,24 +80,25 @@ Uint32 getBoardModel() {
 Uint32 getBoardRevision() {
     int index = 0;
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = RequestCode; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetBoardRevision, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardRevision, 4, 0, 0);
 
     // End tag
-    mbpb->tags[index] = End;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & ResponseCodeBit) && ((mbpb->code & ResponseCodeErrorBit) == 0)) {
-        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[0]));
-        if (tag->id == GetBoardRevision)
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetBoardRevision) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
             return tag->uint32Values[0];
     }
 
@@ -105,24 +108,25 @@ Uint32 getBoardRevision() {
 int getBoardMacAddress(Uint8 bufForMac[6]) {
     int index = 0;
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = RequestCode; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // GetMacAddress tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetBoardMacAddress, 6, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardMacAddress, 6, 0, 0);
 
     // End tag
-    mbpb->tags[index] = End;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & ResponseCodeBit) && ((mbpb->code & ResponseCodeErrorBit) == 0)) {
-        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[0]));
-        if (tag->id == GetBoardMacAddress) {
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetBoardMacAddress) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 6)) {
             bufForMac[0] = tag->uint8Values[0];
             bufForMac[1] = tag->uint8Values[1];
             bufForMac[2] = tag->uint8Values[2];
@@ -139,24 +143,25 @@ int getBoardMacAddress(Uint8 bufForMac[6]) {
 Uint64 getBoardSerial() {
     int index = 0;
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = RequestCode; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetBoardSerial, 8, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardSerial, 8, 0, 0);
 
     // End tag
-    mbpb->tags[index] = End;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & ResponseCodeBit) && ((mbpb->code & ResponseCodeErrorBit) == 0)) {
-        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[0]));
-        if (tag->id == GetBoardSerial)
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetBoardSerial) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8))
             return tag->uint64Values[0];
     }
 
@@ -168,10 +173,9 @@ Uint64 getBoardSerial() {
  * @return Total count of the filled 32bit data
  */
 int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]) {
-    int padding = (4 - (size & 0x03)) & 0x03;
     tagBuf->id = id;
-    tagBuf->size = size + padding;
-    tagBuf->code = 0x00000000; // request
+    tagBuf->size = (size + 3) & 0xfffffffcUL; // align size to 32bits.
+    tagBuf->code = MPTCRequestTagCode;
     for (int inx = 0 ; inx < paramCount ; inx++)
         tagBuf->uint32Values[inx] = param[inx];
 

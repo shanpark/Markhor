@@ -21,10 +21,12 @@
 
 #include "MarkhorTypes.h"
 
+#pragma pack(push, 4)
+
 typedef struct {
     Uint32 size;
     Uint32 code;
-    Uint32 tags[1];
+    Uint32 tags[0];
 } MailboxPropertyBuffer;
 
 typedef struct {
@@ -32,61 +34,69 @@ typedef struct {
     Uint32 size;
     Uint32 code;
     union {
-        Uint8 uint8Values[4];
-        Uint32 uint32Values[1];
+        Uint8 uint8Values[0];
+        Uint32 uint32Values[0];
         Uint64 uint64Values[0];
     };
 } MailboxPropertyTag;
 
+#pragma pack(pop)
+
 typedef enum {
-    End                 = 0x00000000,
+    MPTIGetFirmwareRevision = 0x00000001,
+
+    MPTIGetBoardModel       = 0x00010001,
+    MPTIGetBoardRevision    = 0x00010002,
+    MPTIGetBoardMacAddress  = 0x00010003,
+    MPTIGetBoardSerial      = 0x00010004,
     
-    GetFirmwareRevision = 0x00000001,
+    MPTISetCursorInfo       = 0x00008010,
+    MPTISetCursorState      = 0x00008011,
 
-    GetBoardModel       = 0x00010001,
-    GetBoardRevision    = 0x00010002,
-    GetBoardMacAddress  = 0x00010003,
-    GetBoardSerial      = 0x00010004,
-    
-    SetCursorInfo       = 0x00008010,
-    SetCursorState      = 0x00008011,
+    MPTIAllocateFrameBuffer = 0x00040001,
+    MPTIBlankScreen         = 0x00040002,
+    MPTIGetPhysicalWH       = 0x00040003,
+    MPTIGetVirtualWH        = 0x00040004,
+    MPTIGetDepth            = 0x00040005,
+    MPTIGetPixelOrder       = 0x00040006,
+    MPTIGetAlphaMode        = 0x00040007,
+    MPTIGetPitch            = 0x00040008,
+    MPTIGetVirtualOffset    = 0x00040009,
+    MPTIGetOverscan         = 0x0004000a,
+    MPTIGetPalette          = 0x0004000b,
 
-    AllocateFrameBuffer = 0x00040001,
-    BlankScreen         = 0x00040002,
-    GetPhysicalWH       = 0x00040003,
-    GetVirtualWH        = 0x00040004,
-    GetDepth            = 0x00040005,
-    GetPixelOrder       = 0x00040006,
-    GetAlphaMode        = 0x00040007,
-    GetPitch            = 0x00040008,
-    GetVirtualOffset    = 0x00040009,
-    GetOverscan         = 0x0004000a,
-    GetPalette          = 0x0004000b,
+    MPTITestPhysicalWH      = 0x00044003,
+    MPTITestVirtualWH       = 0x00044004,
+    MPTITestDepth           = 0x00044005,
+    MPTITestPixelOrder      = 0x00044006,
+    MPTITestAlphaMode       = 0x00044007,
+    MPTITestVirtualOffset   = 0x00044009,
+    MPTITestOverscan        = 0x0004400a,
+    MPTITestPalette         = 0x0004400b,
 
-    TestPhysicalWH      = 0x00044003,
-    TestVirtualWH       = 0x00044004,
-    TestDepth           = 0x00044005,
-    TestPixelOrder      = 0x00044006,
-    TestAlphaMode       = 0x00044007,
-    TestVirtualOffset   = 0x00044009,
-    TestOverscan        = 0x0004400a,
-    TestPalette         = 0x0004400b,
+    MPTIReleaseFrameBuffer  = 0x00048001,
+    MPTISetPhysicalWH       = 0x00048003,
+    MPTISetVirtualWH        = 0x00048004,
+    MPTISetDepth            = 0x00048005,
+    MPTISetPixelOrder       = 0x00048006,
+    MPTISetAlphaMode        = 0x00048007,
+    MPTISetVirtualOffset    = 0x00048009,
+    MPTISetOverscan         = 0x0004800a,
+    MPTISetPalette          = 0x0004800b,
 
-    ReleaseFrameBuffer  = 0x00048001,
-    SetPhysicalWH       = 0x00048003,
-    SetVirtualWH        = 0x00048004,
-    SetDepth            = 0x00048005,
-    SetPixelOrder       = 0x00048006,
-    SetAlphaMode        = 0x00048007,
-    SetVirtualOffset    = 0x00048009,
-    SetOverscan         = 0x0004800a,
-    SetPalette          = 0x0004800b
+    MPTIEnd                 = 0x00000000
 } MailboxPropertyTagId;
 
 typedef enum {
-    RequestCode             = 0x00000000,
-    ResponseCodeBit         = 0x80000000,
-    ResponseCodeErrorBit    = 0x00000001
+    MPICRequestCode             = 0x00000000,
+    MPICResponseCodeBit         = 0x80000000,
+    MPICResponseCodeErrorBit    = 0x00000001
+} MailboxPropertyInterfaceCode;
+
+typedef enum {
+    MPTCRequestTagCode          = 0x00000000,
+    MPTCResponseTagCodeBit      = 0x80000000,
+    MPTCResponseTagCodeSizeBits = 0x7fffffff
 } MailboxPropertyTagCode;
 
 extern Uint32 bufferForMailbox[1024] __attribute__((aligned(16)));

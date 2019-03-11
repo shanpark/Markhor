@@ -3,6 +3,7 @@ build/
 kernel.img
 kernel.disasm
 kernel.nm
+settings.json
 
 # Prerequisites
 *.d

@@ -26,69 +26,70 @@ int setDisplay(Uint32 width, Uint32 height, Uint32 bpp) {
     int index = 0;
     Uint32 params[2];
     
-    MailboxPropertyBuffer * mbpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mbpb->code = 0x00000000; // request
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
 
     // AllocateFrameBuffer tag
     params[0] = 0x10; // frame buffer alignment in bytes. //??? 어디에도 적당한 값이 없다. va_arg()가 오동작할 때 나오는 값을 쓴다. ;; 0인 것 같다. 일단 4를 쓰자.
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), AllocateFrameBuffer, 8, 1, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIAllocateFrameBuffer, 8, 1, params);
 
     // SetPhysicalWH tag
     params[0] = width;
     params[1] = height;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), SetPhysicalWH, 8, 2, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetPhysicalWH, 8, 2, params);
 
     // SetVirtualWH tag
     params[0] = width;
     params[1] = height;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), SetVirtualWH, 8, 2, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetVirtualWH, 8, 2, params);
 
     // SetDepth tag
     params[0] = bpp;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), SetDepth, 4, 1, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetDepth, 4, 1, params);
 
     // GetPitch tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mbpb->tags[index]), GetPitch, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetPitch, 4, 0, 0);
 
     // End tag
-    mbpb->tags[index] = 0x00000000;
+    mpb->tags[index] = MPTIEnd;
     index++;
 
-    mbpb->size = ((index + 2) << 2);
+    mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mbpb);
-    mbpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
-    if ((mbpb->code & 0x80000000) && ((mbpb->code & 0x00000001) == 0)) {
-        int end = (mbpb->size >> 2) - 2; // convert into Uint32 unit. and exclude header size.
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        int end = (mpb->size >> 2) - 2; // convert into Uint32 unit. and exclude header size.
         for (index = 0 ; index < end ; ) {
-            MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mbpb->tags[index]));
-            switch (tag->id) {
-                case AllocateFrameBuffer:
-                    displayInfo.frameBuffer = (Address)tag->uint32Values[0];
-                    displayInfo.frameBufferEnd = displayInfo.frameBuffer + tag->uint32Values[1];
-                    index += (3 + 2);
-                    break;
-                case SetPhysicalWH:
-                    displayInfo.physicalWidth = tag->uint32Values[0];
-                    displayInfo.physicalHeight = tag->uint32Values[1];
-                    index += (3 + 2);
-                    break;
-                case SetVirtualWH:
-                    displayInfo.virtualWidth = tag->uint32Values[0];
-                    displayInfo.virtualHeight = tag->uint32Values[1];
-                    index += (3 + 2);
-                    break;
-                case SetDepth:
-                    displayInfo.bpp = tag->uint32Values[0];
-                    index += (3 + 1);
-                    break;
-                case GetPitch:
-                    displayInfo.pitch = tag->uint32Values[0];
-                    index += (3 + 1);
-                    break;
-                case 0x00000000: // End tag.
-                    goto END_HANDLE_TAGS; // for safe.
+            MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[index]));
+            if (tag->code & MPTCResponseTagCodeBit) {
+                int size = ((tag->code & MPTCResponseTagCodeSizeBits) + 3) >> 2; // Uint32 unit.
+                switch (tag->id) {
+                    case MPTIAllocateFrameBuffer:
+                        displayInfo.frameBuffer = (Address)tag->uint32Values[0];
+                        displayInfo.frameBufferEnd = displayInfo.frameBuffer + tag->uint32Values[1];
+                        break;
+                    case MPTISetPhysicalWH:
+                        displayInfo.physicalWidth = tag->uint32Values[0];
+                        displayInfo.physicalHeight = tag->uint32Values[1];
+                        break;
+                    case MPTISetVirtualWH:
+                        displayInfo.virtualWidth = tag->uint32Values[0];
+                        displayInfo.virtualHeight = tag->uint32Values[1];
+                        break;
+                    case MPTISetDepth:
+                        displayInfo.bpp = tag->uint32Values[0];
+                        break;
+                    case MPTIGetPitch:
+                        displayInfo.pitch = tag->uint32Values[0];
+                        break;
+                    case MPTIEnd: // End tag.
+                        goto END_HANDLE_TAGS; // for safe.
+                }
+                index += (3 + size);
+            } else {
+                break;
             }
         }
 

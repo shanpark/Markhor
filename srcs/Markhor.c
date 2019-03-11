@@ -21,10 +21,12 @@
 #include "MailboxProperty.h"
 #include "Display.h"
 
-#define WIDTH   1680
-#define HEIGHT  1050
+// #define WIDTH   1680
+// #define HEIGHT  1050
+#define WIDTH   1920
+#define HEIGHT  1080
 #define DEPTH   32
-#define COLOR   0x00ffffff // 0xaarrggbb
+#define COLOR   0xffffffff // 0xaarrggbb
 
 int Markhor(void) {
     GpioSelectFunction(16, 1);
@@ -39,26 +41,26 @@ int Markhor(void) {
     setPixel(WIDTH - 2, HEIGHT - 2, COLOR);
     setPixel(WIDTH - 1, HEIGHT - 1, COLOR);
 
-    // char buf[256];
+    char buf[256];
 
-    // sprintf(buf, "Firmware Revision: %08X", getFirmwareRevision());
-    // putString(0, 0, buf, COLOR);
+    sprintf(buf, "Firmware Revision: %08X", getFirmwareRevision());
+    putString(0, 0, buf, COLOR);
 
-    // sprintf(buf, "Board Model: %08X", getBoardModel());
-    // putString(0, 1, buf, COLOR);
+    sprintf(buf, "Board Model: %08X", getBoardModel());
+    putString(0, 1, buf, COLOR);
 
-    // sprintf(buf, "Board Revision: %08X", getBoardRevision());
-    // putString(0, 2, buf, COLOR);
+    sprintf(buf, "Board Revision: %08X", getBoardRevision());
+    putString(0, 2, buf, COLOR);
 
-    // Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    // if (getBoardMacAddress(mac) == 0)
-    //     sprintf(buf, "Board MAC Address: %02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    // else
-    //     sprintf(buf, "Board MAC Address: %08X", -1);
-    // putString(0, 3, buf, COLOR);
+    Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    if (getBoardMacAddress(mac) == 0)
+        sprintf(buf, "Board MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    else
+        sprintf(buf, "Board MAC Address: %08X", -1);
+    putString(0, 3, buf, COLOR);
 
-    // sprintf(buf, "Board Serial: %ld", getBoardSerial());
-    // putString(0, 4, buf, COLOR);
+    sprintf(buf, "Board Serial: %llu", getBoardSerial());
+    putString(0, 4, buf, COLOR);
 
     return 0;
 }
