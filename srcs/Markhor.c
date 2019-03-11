@@ -16,51 +16,66 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include "Gpio.h"
+#include "MailboxProperty.h"
 #include "Display.h"
+
+#define WIDTH   1680
+#define HEIGHT  1050
+#define DEPTH   32
+#define COLOR   0x00ffffff // 0xaarrggbb
 
 int Markhor(void) {
     GpioSelectFunction(16, 1);
 
-    if (setDisplay(1920, 1080, 32) == 0)
+    if (setDisplay(WIDTH, HEIGHT, DEPTH) == 0)
         GpioClearOutputPin(16);
     else
         GpioSetOutputPin(16);
 
-    setPixel(0, 0, 0x00ffffff);
-    setPixel(1920 - 1, 1080 -1, 0x00ffffff);
+    setPixel(0, 0, COLOR);
+    setPixel(1, 1, COLOR);
+    setPixel(WIDTH - 2, HEIGHT - 2, COLOR);
+    setPixel(WIDTH - 1, HEIGHT - 1, COLOR);
 
-    putChar(0, 0, 'A');
-    putChar(1, 0, 'B');
-    putChar(2, 0, 'C');
-    putChar(3, 0, 'D');
-    putChar(4, 0, 'E');
-    putChar(5, 0, 'F');
-    putChar(6, 0, 'G');
-    putChar(7, 0, 'H');
-    putChar(8, 0, 'I');
-    putChar(9, 0, 'J');
+    // char buf[256];
 
-    putChar(0, 1, 'a');
-    putChar(1, 1, 'b');
-    putChar(2, 1, 'c');
-    putChar(3, 1, 'd');
-    putChar(4, 1, 'e');
-    putChar(5, 1, 'f');
-    putChar(6, 1, 'g');
-    putChar(7, 1, 'h');
-    putChar(8, 1, 'i');
-    putChar(9, 1, 'j');
+    // sprintf(buf, "Firmware Revision: %08X", getFirmwareRevision());
+    // putString(0, 0, buf, COLOR);
 
-    // while (1) {
-    //     if (GpioGetPinValue(16) == GPV_HI)
-    //         GpioClearOutputPin(16);
-    //     else
-    //         GpioSetOutputPin(16);
+    // sprintf(buf, "Board Model: %08X", getBoardModel());
+    // putString(0, 1, buf, COLOR);
 
-    //     for (int inx = 0 ; inx < 500000 ; inx++)
-    //         NOP();
-    // }
+    // sprintf(buf, "Board Revision: %08X", getBoardRevision());
+    // putString(0, 2, buf, COLOR);
+
+    // Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    // if (getBoardMacAddress(mac) == 0)
+    //     sprintf(buf, "Board MAC Address: %02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    // else
+    //     sprintf(buf, "Board MAC Address: %08X", -1);
+    // putString(0, 3, buf, COLOR);
+
+    // sprintf(buf, "Board Serial: %ld", getBoardSerial());
+    // putString(0, 4, buf, COLOR);
 
     return 0;
+}
+
+/**
+ * NOT complete function. must be rewritten.
+ */
+extern char _end;
+void * _sbrk(int incr) {
+    static char* heap_end = &_end;
+    char* prev_heap_end;
+
+    // if (heap_end == 0)
+    //     heap_end = &_end;
+
+     prev_heap_end = heap_end;
+     heap_end += incr;
+
+     return (void *)prev_heap_end;
 }

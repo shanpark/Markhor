@@ -36,6 +36,7 @@ extern DisplayInfo displayInfo;
 
 extern int setDisplay(Uint32 width, Uint32 height, Uint32 bpp);
 extern void setPixel(Uint32 x, Uint32 y, Uint32 color);
-extern void putChar(Uint32 x, Uint32 y, Uint32 ascii);
+extern void putChar(Uint32 x, Uint32 y, Uint32 ascii, Uint32 color);
+extern void putString(Uint32 x, Uint32 y, char *str, Uint32 color);
 
 #endif /* __DISPLAY_H */

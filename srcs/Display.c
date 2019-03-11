@@ -16,8 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Display.h"
 #include "Mailbox.h"
+#include "MailboxProperty.h"
+#include "Display.h"
 
 DisplayInfo displayInfo;
 
@@ -101,25 +102,66 @@ END_HANDLE_TAGS:
 void setPixel(Uint32 x, Uint32 y, Uint32 color) {
     if ((x < displayInfo.physicalWidth) && (y < displayInfo.physicalHeight)) {
         Address dest = displayInfo.frameBuffer + (y * displayInfo.pitch) + (x * (displayInfo.bpp >> 3));
-        *((Uint32 *)dest) = color;
+        switch (displayInfo.bpp) {
+            case 8:
+                *((Uint8 *)dest) = (Uint8)(color & 0x000000ff);
+                break;
+            case 16:
+                *((Uint16 *)dest) = (Uint16)(color & 0x0000ffff);
+                break;
+            case 24:
+                *((Uint8 *)dest) = (Uint8)(color & 0x000000ff);
+                *((Uint8 *)dest + 1) = (Uint8)((color >> 8) & 0x000000ff);
+                *((Uint8 *)dest + 2) = (Uint8)((color >> 16) & 0x000000ff);
+                break;
+            case 32:
+                *((Uint32 *)dest) = color;
+                break;
+        }
     }
 }
 
 extern Uint8 font[2048];
 
-void putChar(Uint32 x, Uint32 y, Uint32 ascii) {
-    int color = 0xffffffff;
+void putChar(Uint32 x, Uint32 y, Uint32 ascii, Uint32 color) {
     int fontOffset = ascii * 16;
     int screenOffset = (displayInfo.pitch * (y << 4)) + ((x << 3) * (displayInfo.bpp >> 3));
     Address dest = displayInfo.frameBuffer + screenOffset;
 
     for (int y = 0 ; y < 16 ; y++) {
         for (int x = 0x01 ; x <= 0x80 ; x <<= 1) {
-            if (font[fontOffset] & x)
-                *((Uint32 *)dest) = color;
-            dest += 4;    
+            if (font[fontOffset] & x) {
+                switch (displayInfo.bpp) {
+                    case 8:
+                        *((Uint8 *)dest) = (Uint8)(color & 0x000000ff);
+                        break;
+                    case 16:
+                        *((Uint16 *)dest) = (Uint16)(color & 0x0000ffff);
+                        break;
+                    case 24:
+                        *((Uint8 *)dest) = (Uint8)(color & 0x000000ff);
+                        *((Uint8 *)dest + 1) = (Uint8)((color >> 8) & 0x000000ff);
+                        *((Uint8 *)dest + 2) = (Uint8)((color >> 16) & 0x000000ff);
+                        break;
+                    case 32:
+                        *((Uint32 *)dest) = color;
+                        break;
+                }
+            }
+            dest += (displayInfo.bpp >> 3);
         }
         fontOffset++;
-        dest += (displayInfo.pitch -(4 * 8));
+        dest += (displayInfo.pitch - displayInfo.bpp);
+    }
+}
+
+void putString(Uint32 x, Uint32 y, char *str, Uint32 color) {
+    while (*str) {
+        putChar(x, y, *str, color);
+        if (((++x) * 8) >= displayInfo.physicalWidth) {
+            x = 0;
+            y++;
+        }
+        str++;
     }
 }

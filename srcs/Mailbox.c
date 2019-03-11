@@ -18,8 +18,6 @@
 
 #include "Mailbox.h"
 
-Uint32 bufferForMailbox[1024] __attribute__((aligned(16)));
-
 /**
  * Read data from Mailbox.
  * https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
@@ -70,18 +68,4 @@ void writeToMailbox(MailboxChannel channel, Uint32 data) {
 
     // write the value to the requested channel
     mailboxRegister[WRITE_DATA] = data;
-}
-
-/**
- * Fill Mailbox request tag structure. Support only tags with 32 bit data values.
- * @return Total count of the filled 32bit data
- */
-int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]) {
-    tagBuf->id = id;
-    tagBuf->size = size;
-    tagBuf->code = 0x00000000; // request
-    for (int inx = 0 ; inx < paramCount ; inx++)
-        tagBuf->uint32Values[inx] = param[inx];
-
-    return (3 + (size >> 2));
 }
