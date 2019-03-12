@@ -49,6 +49,26 @@ typedef enum {
     MPTIGetBoardRevision    = 0x00010002,
     MPTIGetBoardMacAddress  = 0x00010003,
     MPTIGetBoardSerial      = 0x00010004,
+    MPTIGetArmMemory        = 0x00010005,
+    MPTIGetVcMemory         = 0x00010006,
+    MPTIGetClocks           = 0x00010007,
+
+    MPTIGetPowerState       = 0x00020001,
+    MPTIGetEnableWaitTime   = 0x00020002,
+    MPTISetPowerState       = 0x00028001,
+
+    MPTIGetClockState       = 0x00030001,
+    MPTIGetClockRate        = 0x00030002,
+    MPTIGetMaxClockRate     = 0x00030004,
+    MPTIGetMinClockRate     = 0x00030007,
+    MPTIGetTurbo            = 0x00030009,
+    MPTISetClockState       = 0x00038001,
+    MPTISetClockRate        = 0x00038002,
+    MPTISetTurbo            = 0x00038009,
+
+    MPTIGetCommandLine      = 0x00050001,
+
+    MPTIGetDmaChannels      = 0x00060001,
     
     MPTISetCursorInfo       = 0x00008010,
     MPTISetCursorState      = 0x00008011,
@@ -99,6 +119,67 @@ typedef enum {
     MPTCResponseTagCodeSizeBits = 0x7fffffff
 } MailboxPropertyTagCode;
 
+typedef enum {
+    CIRoot   = 0x00000000, /* Not exists */
+    CIEmmc   = 0x00000001,
+    CIUart   = 0x00000002,
+    CIArm    = 0x00000003,
+    CICore   = 0x00000004,
+    CIV3d    = 0x00000005,
+    CIH264   = 0x00000006,
+    CIIsp    = 0x00000007,
+    CISdram  = 0x00000008,
+    CIPixel  = 0x00000009,
+    CIPwm    = 0x0000000a,
+} ClockId;
+
+typedef enum {
+    DMA0    = 0x00000001 << 0,
+    DMA1    = 0x00000001 << 1,
+    DMA2    = 0x00000001 << 2,
+    DMA3    = 0x00000001 << 3,
+    DMA4    = 0x00000001 << 4,
+    DMA5    = 0x00000001 << 5,
+    DMA6    = 0x00000001 << 6,
+    DMA7    = 0x00000001 << 7,
+    DMA8    = 0x00000001 << 8,
+    DMA9    = 0x00000001 << 9,
+    DMA10   = 0x00000001 << 10,
+    DMA11   = 0x00000001 << 11,
+    DMA12   = 0x00000001 << 12,
+    DMA13   = 0x00000001 << 13,
+    DMA14   = 0x00000001 << 14,
+    DMA15   = 0x00000001 << 15
+} DMAChannel;
+
+typedef enum {
+    DISdCard  = 0x00000000,
+    DIUart0   = 0x00000001,
+    DIUart1   = 0x00000002,
+    DIUsbHcd  = 0x00000003,
+    DII2c0    = 0x00000004,
+    DII2c1    = 0x00000005,
+    DII2c2    = 0x00000006,
+    DISpi     = 0x00000007,
+    DICcp2tx  = 0x00000008,
+} DeviceId;
+
+typedef enum {
+    PSOnBit         = 0x00000001,
+    PSNotExistBit   = 0x00000002,
+    PSWaitBit       = 0x00000002
+} PowerState;
+
+typedef enum {
+    CSOnBit         = 0x00000001,
+    CSNotExistBit   = 0x00000002
+} ClockState;
+
+typedef struct {
+    Uint32 parentId;
+    Uint32 id;
+} Clock;
+
 extern Uint32 bufferForMailbox[1024] __attribute__((aligned(16)));
 
 extern Uint32 getFirmwareRevision();
@@ -106,6 +187,22 @@ extern Uint32 getBoardModel();
 extern Uint32 getBoardRevision();
 extern int getBoardMacAddress(Uint8 bufForMac[6]);
 extern Uint64 getBoardSerial();
+extern int getArmMemory(Address * base, Uint64 * size);
+extern int getVcMemory(Address * base, Uint64 * size);
+extern int getClocks(int * clockCount, Clock clocks[]);
+extern int getCommandLine(int * bufLen, char buffer[]);
+extern Uint32 getDmaChannels();
+extern Uint32 getPowerState(DeviceId deviceId);
+extern Uint32 getEnableWaitTime(DeviceId deviceId);
+extern Uint32 setPowerState(DeviceId deviceId, Uint32 state);
+extern Uint32 getClockState(ClockId clockId);
+extern Uint32 setClockState(ClockId clockId, Uint32 state);
+extern Uint32 getClockRate(ClockId clockId);
+extern Uint32 setClockRate(ClockId clockId, Uint32 rate, Uint32 skipSettingTurbo);
+extern Uint32 getMaxClockRate(ClockId clockId);
+extern Uint32 getMinClockRate(ClockId clockId);
+extern Uint32 getTurbo(Uint32 id);
+extern Uint32 setTurbo(Uint32 id, Uint32 level);
 
 extern int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]);
 
