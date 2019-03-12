@@ -748,6 +748,227 @@ Uint32 setTurbo(Uint32 id, Uint32 level) {
 }
 
 /**
+ * @return offset from 1.2V in units of 0.025V. 0x80000000 for invalid voltage id. -1 for failure.
+ *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
+ */
+Uint32 getVoltage(VoltageId voltageId) {
+    int index = 0;
+    Uint32 params[1];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetPowerState tag
+    params[0] = voltageId;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetVoltage, 8, 1, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetVoltage) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @param voltageId
+ * @param voltage offset from 1.2V in units of 0.025V.
+ * @return offset from 1.2V in units of 0.025V. 0x80000000 for invalid voltage id. -1 for failure.
+ */
+Uint32 setVoltage(VoltageId voltageId, Uint32 voltage) {
+    int index = 0;
+    Uint32 params[2];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetPowerState tag
+    params[0] = voltageId;
+    params[1] = voltage;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetVoltage, 8, 2, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTISetVoltage) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @return the maximum supported voltage rate for the given id. -1 for failure.
+ *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
+ */
+Uint32 getMaxVoltage(VoltageId voltageId) {
+    int index = 0;
+    Uint32 params[1];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetMaxVoltage tag
+    params[0] = voltageId;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMaxVoltage, 8, 1, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetMaxVoltage) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @return the minimum supported voltage rate for the given id. -1 for failure.
+ *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
+ */
+Uint32 getMinVoltage(VoltageId voltageId) {
+    int index = 0;
+    Uint32 params[1];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetMinVoltage tag
+    params[0] = voltageId;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMinVoltage, 8, 1, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetMinVoltage) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @param temperatureId should be zero.
+ * @return Return the temperature of the SoC in thousandths of a degree C (degree * 1000). -1 for failure.
+ */
+Uint32 getTemperature(Uint32 temperatureId) {
+    int index = 0;
+    Uint32 params[1];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetPowerState tag
+    params[0] = temperatureId;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetTemperature, 8, 1, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetTemperature) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @param temperatureId should be zero.
+ * @return Return the temperature of the SoC in thousandths of a degree C (degree * 1000). -1 for failure.
+ */
+Uint32 getMaxTemperature(Uint32 temperatureId) {
+    int index = 0;
+    Uint32 params[1];
+
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
+    mpb->code = MPICRequestCode;
+
+    // GetMaxVoltage tag
+    params[0] = temperatureId;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMaxTemperature, 8, 1, params);
+
+    // End tag
+    mpb->tags[index] = MPTIEnd;
+    index++;
+
+    mpb->size = ((index + 2) << 2);
+
+    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+
+    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
+        if ((tag->id == MPTIGetMaxTemperature) && 
+            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+            return tag->uint32Values[1];
+        }
+    }
+
+    return -1;
+}
+
+// following functions not implemented.
+// Allocate Memory
+// Lock memory
+// Unlock memory
+// Release Memory
+// Execute Code
+// Get Dispmanx Resource mem handle 
+// Get EDID block
+
+/**
  * Fill Mailbox request tag structure. Support only tags with 32 bit data values.
  * @return Total count of the filled 32bit data
  */

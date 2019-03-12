@@ -59,11 +59,17 @@ typedef enum {
 
     MPTIGetClockState       = 0x00030001,
     MPTIGetClockRate        = 0x00030002,
+    MPTIGetVoltage          = 0x00030003,
     MPTIGetMaxClockRate     = 0x00030004,
+    MPTIGetMaxVoltage       = 0x00030005,
+    MPTIGetTemperature      = 0x00030006,
     MPTIGetMinClockRate     = 0x00030007,
+    MPTIGetMinVoltage       = 0x00030008,
     MPTIGetTurbo            = 0x00030009,
+    MPTIGetMaxTemperature   = 0x0003000a,
     MPTISetClockState       = 0x00038001,
     MPTISetClockRate        = 0x00038002,
+    MPTISetVoltage          = 0x00038003,
     MPTISetTurbo            = 0x00038009,
 
     MPTIGetCommandLine      = 0x00050001,
@@ -175,6 +181,13 @@ typedef enum {
     CSNotExistBit   = 0x00000002
 } ClockState;
 
+typedef enum {
+    VICore      = 0x00000001,
+    VISdramC    = 0x00000002,
+    VISdramP    = 0x00000003,
+    VISdramI    = 0x00000004,
+} VoltageId;
+
 typedef struct {
     Uint32 parentId;
     Uint32 id;
@@ -203,6 +216,12 @@ extern Uint32 getMaxClockRate(ClockId clockId);
 extern Uint32 getMinClockRate(ClockId clockId);
 extern Uint32 getTurbo(Uint32 id);
 extern Uint32 setTurbo(Uint32 id, Uint32 level);
+extern Uint32 getVoltage(VoltageId voltageId);
+extern Uint32 setVoltage(VoltageId voltageId, Uint32 voltage);
+extern Uint32 getMaxVoltage(VoltageId voltageId);
+extern Uint32 getMinVoltage(VoltageId voltageId);
+extern Uint32 getTemperature(Uint32 temperatureId);
+extern Uint32 getMaxTemperature(Uint32 temperatureId);
 
 extern int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]);
 

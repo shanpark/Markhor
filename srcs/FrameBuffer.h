@@ -16,11 +16,26 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __DISPLAY_H
-#define __DISPLAY_H
+#ifndef __FRAME_BUFFER_H
+#define __FRAME_BUFFER_H
 
-extern void setPixel(Uint32 x, Uint32 y, Uint32 color);
-extern void putChar(Uint32 x, Uint32 y, Uint32 ascii, Uint32 color);
-extern void putString(Uint32 x, Uint32 y, char *str, Uint32 color);
+#include "MarkhorTypes.h"
 
-#endif /* __DISPLAY_H */
+typedef struct {
+    Address base;
+    Address end;
+    Uint32 physicalWidth;
+    Uint32 physicalHeight;
+    Uint32 virtualOffsetX;
+    Uint32 virtualOffsetY;
+    Uint32 virtualWidth;
+    Uint32 virtualHeight;
+    Uint32 bpp;
+    Uint32 pitch;
+} FrameBuffer;
+
+extern FrameBuffer frameBuffer;
+
+int setFrameBuffer(Uint32 width, Uint32 height, Uint32 bpp);
+
+#endif /* __FRAME_BUFFER_H */

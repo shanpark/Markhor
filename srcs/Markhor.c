@@ -19,19 +19,20 @@
 #include <stdio.h>
 #include "Gpio.h"
 #include "MailboxProperty.h"
+#include "FrameBuffer.h"
 #include "Display.h"
 
-#define WIDTH   1680
-#define HEIGHT  1050
-// #define WIDTH   1920
-// #define HEIGHT  1080
+// #define WIDTH   1680
+// #define HEIGHT  1050
+#define WIDTH   1920
+#define HEIGHT  1080
 #define DEPTH   32
 #define COLOR   0xffffffff // 0xaarrggbb
 
 int Markhor(void) {
     GpioSelectFunction(16, 1);
 
-    if (setDisplay(WIDTH, HEIGHT, DEPTH) == 0)
+    if (setFrameBuffer(WIDTH, HEIGHT, DEPTH) == 0)
         GpioClearOutputPin(16);
     else
         GpioSetOutputPin(16);
@@ -44,7 +45,7 @@ int Markhor(void) {
     char buf[512];
     int y;
     
-    sprintf(buf, "Frame Buffer Base: %08X", displayInfo.frameBuffer);
+    sprintf(buf, "Frame Buffer Base: %08X", frameBuffer.base);
     putString(0, y++, buf, COLOR);
 
     sprintf(buf, "Firmware Revision: %08X", getFirmwareRevision());
@@ -172,15 +173,6 @@ int Markhor(void) {
         }
     }
 
-// extern Uint32 getClockState(ClockId clockId);
-// extern Uint32 setClockState(ClockId clockId, Uint32 state);
-// extern Uint32 getClockRate(ClockId clockId);
-// extern Uint32 setClockRate(ClockId clockId, Uint32 rate, Uint32 skipSettingTurbo);
-// extern Uint32 getMaxClockRate(ClockId clockId);
-// extern Uint32 getMinClockRate(ClockId clockId);
-// extern Uint32 getTurbo(Uint32 id);
-// extern Uint32 setTurbo(Uint32 id, Uint32 level);
-
     const ClockId clockId = CIPwm;
 NEXT0:
     state = getClockState(clockId);
@@ -237,12 +229,76 @@ NEXT0:
         putString(0, y++, buf, COLOR);
     }
 
+    state = setClockState(clockId, 0);
+    if (state != (Uint32)(-1)) {
+        sprintf(buf, "Clock[%d] Set State: %s, %s", clockId, (state & CSOnBit) ? "On" : "Off", (state & CSNotExistBit) ? "Not Exist" : "Exist");
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Clock[%d] Set State: fail", clockId);
+        putString(0, y++, buf, COLOR);
+    }
+
     Uint32 level = getTurbo(0);
     if (state != (Uint32)(-1)) {
         sprintf(buf, "Turbo Level: %u", level);
         putString(0, y++, buf, COLOR);
     } else {
         sprintf(buf, "Turbo Level: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    // level = setTurbo(0, 1);
+    // if (state != (Uint32)(-1)) {
+    //     sprintf(buf, "Set Turbo Level: %u", level);
+    //     putString(0, y++, buf, COLOR);
+    // } else {
+    //     sprintf(buf, "Set Turbo Level: fail");
+    //     putString(0, y++, buf, COLOR);
+    // }
+
+    VoltageId voltageId = VISdramC;
+    Uint32 voltage = getVoltage(voltageId);
+    if (voltage != (Uint32)(-1)) {
+        sprintf(buf, "Voltage[%d]: %u", voltageId, voltage);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Voltage[%d]: fail", voltageId);
+        putString(0, y++, buf, COLOR);
+    }
+
+    voltage = getMaxVoltage(voltageId);
+    if (voltage != (Uint32)(-1)) {
+        sprintf(buf, "Voltage[%d] Max: %u", voltageId, voltage);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Voltage[%d] Max: fail", voltageId);
+        putString(0, y++, buf, COLOR);
+    }
+
+    voltage = getMinVoltage(voltageId);
+    if (voltage != (Uint32)(-1)) {
+        sprintf(buf, "Voltage[%d] Min: %u", voltageId, voltage);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Voltage[%d] Min: fail", voltageId);
+        putString(0, y++, buf, COLOR);
+    }
+
+    Uint32 temperature = getTemperature(0);
+    if (temperature != (Uint32)(-1)) {
+        sprintf(buf, "Temperatore: %u", temperature);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Temperatore]: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    temperature = getMaxTemperature(0);
+    if (temperature != (Uint32)(-1)) {
+        sprintf(buf, "Temperatore Max: %u", temperature);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Temperatore Max: fail");
         putString(0, y++, buf, COLOR);
     }
 
