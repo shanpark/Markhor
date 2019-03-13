@@ -26,8 +26,6 @@ typedef struct {
     Address end;
     Uint32 physicalWidth;
     Uint32 physicalHeight;
-    Uint32 virtualOffsetX;
-    Uint32 virtualOffsetY;
     Uint32 virtualWidth;
     Uint32 virtualHeight;
     Uint32 bpp;

@@ -25,7 +25,7 @@
  * @param func Function to seelct (0 ~ 7)
  * @return 0 if successful. else -1.
  */
-int GpioSelectFunction(Uint32 pin, PinFunction func) {
+int gpioSelectFunction(Uint32 pin, GpioPinFunction func) {
     if ((pin > 54) || (func > 8))
         return -1;
 
@@ -44,7 +44,7 @@ int GpioSelectFunction(Uint32 pin, PinFunction func) {
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int GpioSetOutputPin(Uint32 pin) {
+int gpioSetOutputPin(Uint32 pin) {
     if (pin > 54)
         return -1;
 
@@ -60,7 +60,7 @@ int GpioSetOutputPin(Uint32 pin) {
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int GpioClearOutputPin(Uint32 pin) {
+int gpioClearOutputPin(Uint32 pin) {
     if (pin > 54)
         return -1;
 
@@ -76,13 +76,13 @@ int GpioClearOutputPin(Uint32 pin) {
  * @param pin Pin number. (0 ~ 53)
  * @return 1 = high, 0 = low. -1 = failure.
  */
-PinValue GpioGetPinValue(Uint32 pin) {
+GpioPinValue gpioGetPinValue(Uint32 pin) {
     if (pin > 54)
-        return GPV_ERR;
+        return GPVErr;
 
     GpioRegister * gplevRegister = &((GpioRegister *)GPLEV_BASE)[pin / 32];
     if (*gplevRegister & (1 << (pin % 32)))
-        return GPV_HI;
+        return GPVHi;
 
-    return GPV_LO;
+    return GPVLo;
 }

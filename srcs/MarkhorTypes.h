@@ -30,6 +30,6 @@ typedef uint32_t    Uint32;
 typedef int64_t     Int64;
 typedef uint64_t    Uint64;
 
-typedef Int8 *      Address;
+typedef uintptr_t   Address;
 
 #endif /* __MARKHOR_TYPES_H */

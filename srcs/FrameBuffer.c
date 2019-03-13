@@ -556,8 +556,11 @@ int setVirtualOffset(Uint32 * x, Uint32 * y) {
 }
 
 /**
- * 바로 전에 설정한 팔레트와 다른 값이 나온다. 화면에 표시된 색으로 봐서는 설정이 제대로 된 것 같고 
- * 이 함수가 오동작하는 것으로 판단됨.
+ * 설정할 때 넘기는 값과 다른 값이 나온다. 설정한 대로 화면에 나오는 것으로 볼 때 설정값이 틀린 것 같지는 않다.
+ * 바로 전에 설정한 팔레트와 다른 값이 나온다. 하지만 일정한 값이 나오는 걸로 볼 때 가져올 때 포맷이 달라지는 것 같은데
+ * 참고할 만한 문서가 없다.
+ * 추리해보건데 R bit는 6 bit right shift 되고, G bit는 4 bit right shift되고 B bit는 상위 6비트만 남고 하위 2비트는 0으로 바뀐다.
+ * 
  * @param palette must be Uint32[256] size or more.
  * @return 0 if success, -1 for failure.
  */
@@ -592,9 +595,15 @@ int getPalette(Uint32 * palette) {
 }
 
 /**
+ * depth가 8인 경우에 사용되는 컬러 palette를 설정한다. 총 256개의 color가 있으며 
+ * offset 부터 length개 만큼 설정해준다.
+ * 
+ * @param offset 설정할 palette의 offset.
+ * @param length palette의 원소의 갯수.
+ * @param palette 0x00RRGGBB 포맷의 color값의 배열이다.
  * @return 0 if valid, 1 if invalid, -1 for failure.
  */
-int setPalette(Uint32 offset, Uint32 length, Uint32 table[]) {
+int setPalette(Uint32 offset, Uint32 length, Uint32 palette[]) {
     int index = 0;
     Uint32 params[2];
 
@@ -606,7 +615,7 @@ int setPalette(Uint32 offset, Uint32 length, Uint32 table[]) {
     params[1] = length;
     MailboxPropertyTag * tag = (MailboxPropertyTag *)&(mpb->tags[index]);
     index += fillMailboxRequestTagInfo(tag, MPTISetPalette, 8 + (length << 2), 2, params);
-    memcpy(&(tag->uint32Values[2]), table, length << 2);
+    memcpy(&(tag->uint32Values[2]), palette, length << 2);
 
     // End tag
     mpb->tags[index] = MPTIEnd;
