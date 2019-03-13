@@ -22,17 +22,25 @@
 #include "FrameBuffer.h"
 #include "Display.h"
 
-// #define WIDTH   1680
-// #define HEIGHT  1050
-#define WIDTH   1920
-#define HEIGHT  1080
-#define DEPTH   32
-#define COLOR   0xffffffff // 0xaarrggbb
+#define WIDTH   1680
+#define HEIGHT  1050
+// #define WIDTH   1920
+// #define HEIGHT  1080
+#define DEPTH   8
+// #define COLOR   0x00ffffff // 0xaarrggbb. for BGR mode
+#define COLOR   0x07 // 0xaarrggbb. BGRA for little endian.
+
+// format = 0x00bbggrr
+Uint32 palette[16] = { 
+    0x00000000, 0x00000080, 0x00008000, 0x00008080, 0x00800000, 0x00800080, 0x00808000, 0x00c0c0c0,
+    0x00808080, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff };
+
+Uint32 temp[256];
 
 int Markhor(void) {
     GpioSelectFunction(16, 1);
 
-    if (setFrameBuffer(WIDTH, HEIGHT, DEPTH) == 0)
+    if (setFrameBuffer(WIDTH, HEIGHT, WIDTH, HEIGHT, DEPTH) == 0)
         GpioClearOutputPin(16);
     else
         GpioSetOutputPin(16);
@@ -44,8 +52,27 @@ int Markhor(void) {
 
     char buf[512];
     int y;
-    
-    sprintf(buf, "Frame Buffer Base: %08X", frameBuffer.base);
+    Uint32 data;
+
+    if (DEPTH == 8) {
+        data = setPalette(0, sizeof(palette) / sizeof(Uint32), palette);
+        if (data >= 0)
+            sprintf(buf, "Set Palette: %u", data);
+        else
+            sprintf(buf, "Set Palette: fail");
+        putString(0, y++, buf, COLOR);
+
+        if (getPalette(temp) == 0) {
+            if ((palette[6] == temp[6]) && (palette[7] == temp[7]))
+                sprintf(buf, "Get Palette: OK");
+            else
+                sprintf(buf, "Get Palette: NOK [%08X, %08X]", palette[7], temp[7]);
+        } else
+            sprintf(buf, "Get Palette: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    sprintf(buf, "Frame Buffer Base:%08X, End:%08X, Size:%08X, Pitch:%d", frameBuffer.base, frameBuffer.end, frameBuffer.end - frameBuffer.base, frameBuffer.pitch);
     putString(0, y++, buf, COLOR);
 
     sprintf(buf, "Firmware Revision: %08X", getFirmwareRevision());
@@ -302,6 +329,101 @@ NEXT0:
         putString(0, y++, buf, COLOR);
     }
 
+    // blankScreen(1);
+
+    Uint32 width = 1233, height = 233;
+    if (getPhysicalWH(&width, &height) == 0) {
+        sprintf(buf, "Get Physical WH: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Get Physical WH: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    width = 1233, height = 233;
+    if (testPhysicalWH(&width, &height) == 0) {
+        sprintf(buf, "Test Physical WH: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Test Physical WH: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    width = 1233, height = 233;
+    if (getVirtualWH(&width, &height) == 0) {
+        sprintf(buf, "Get Virtual WH: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Get Virtual WH: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    width = 1233, height = 233;
+    if (testVirtualWH(&width, &height) == 0) {
+        sprintf(buf, "Test Virtual WH: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Test Virtual WH: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    Uint32 depth = 8;
+    if (getDepth(&depth) == 0) {
+        sprintf(buf, "Get Depth: %d", depth);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Get Depth: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    depth = 8;
+    if (testDepth(&depth) == 0) {
+        sprintf(buf, "Test Depth: %d", depth);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Test Depth: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    Uint32 pixelOrder = getPixelOrder();
+    if (pixelOrder != (Uint32)(-1))
+        sprintf(buf, "Pixel Order: %s", pixelOrder == 0 ? "BGR" : "RGB");
+    else
+        sprintf(buf, "Pixel Order: fail");
+    putString(0, y++, buf, COLOR);
+
+    data = getAlphaMode();
+    if (data != (Uint32)(-1))
+        sprintf(buf, "Alpha Mode: %u", data);
+    else
+        sprintf(buf, "Alpha Mode: fail");
+    putString(0, y++, buf, COLOR);
+
+    data = getPitch();
+    if (data != (Uint32)(-1))
+        sprintf(buf, "Pitch: %u", data);
+    else
+        sprintf(buf, "Pitch: fail");
+    putString(0, y++, buf, COLOR);
+
+    width = 1, height = 1;
+    if (getVirtualOffset(&width, &height) == 0) {
+        sprintf(buf, "Get Virtual Offset: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Get Virtual Offset: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
+    width = 8, height = 16;
+    if (setVirtualOffset(&width, &height) == 0) {
+        sprintf(buf, "Set Virtual Offset: [%d, %d]", width, height);
+        putString(0, y++, buf, COLOR);
+    } else {
+        sprintf(buf, "Set Virtual Offset: fail");
+        putString(0, y++, buf, COLOR);
+    }
+
     return 0;
 }
 
@@ -310,8 +432,8 @@ NEXT0:
  */
 extern char _end;
 void * _sbrk(int incr) {
-    static char* heap_end = &_end;
-    char* prev_heap_end;
+    static char * heap_end = &_end;
+    char * prev_heap_end;
 
     // if (heap_end == 0)
     //     heap_end = &_end;
