@@ -34,7 +34,7 @@ typedef struct {
 
 extern FrameBuffer frameBuffer;
 
-extern int setFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp);
+extern int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp);
 extern Uint32 blankScreen(Uint32 state);
 extern int getPhysicalWH(Uint32 * width, Uint32 * height);
 extern int testPhysicalWH(Uint32 * width, Uint32 * height);
@@ -48,6 +48,6 @@ extern Uint32 getPitch();
 extern int getVirtualOffset(Uint32 * x, Uint32 * y);
 extern int setVirtualOffset(Uint32 * x, Uint32 * y);
 extern int getPalette(Uint32 * palette);
-extern int setPalette(Uint32 offset, Uint32 length, Uint32 table[]);
+extern int setPalette(Uint32 offset, Uint32 length, Uint32 palette[]);
 
 #endif /* __FRAME_BUFFER_H */

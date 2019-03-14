@@ -24,11 +24,16 @@
 FrameBuffer frameBuffer;
 
 /**
- * Allocate frame buffer for display.
+ * Set screen resolution and allocate frame buffers.
  * 
- * @return 0 for off, 1 for on, -1 for failure.
+ * @param width physical width of frame buffer.
+ * @param height physical height of frame buffer.
+ * @param width of display. may be smaller than width of frame buffer.
+ * @param height of display. may be smaller than height of frame buffer.
+ * @param bpp bit per pixel.
+ * @return 0 if successful, -1 if failed.
  */
-int setFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp) {
+int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp) {
     int index = 0;
     Uint32 params[2];
     
@@ -66,6 +71,7 @@ int setFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHei
     mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+        int result = 0; 
         int end = (mpb->size >> 2) - 2; // convert into Uint32 unit. and exclude header size.
         for (index = 0 ; index < end ; ) {
             MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[index]));
@@ -76,29 +82,37 @@ int setFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHei
                         if (size >= 2) {
                             frameBuffer.base = (Address)tag->uint32Values[0];
                             frameBuffer.end = frameBuffer.base + tag->uint32Values[1];
+                        } else {
+                            return -1;
                         }
                         break;
                     case MPTISetPhysicalWH:
                         if (size >= 2) {
                             frameBuffer.physicalWidth = tag->uint32Values[0];
                             frameBuffer.physicalHeight = tag->uint32Values[1];
+                        } else {
+                            return -1;
                         }
                         break;
                     case MPTISetVirtualWH:
                         if (size >= 2) {
                             frameBuffer.virtualWidth = tag->uint32Values[0];
                             frameBuffer.virtualHeight = tag->uint32Values[1];
+                        } else {
+                            return -1;
                         }
                         break;
                     case MPTISetDepth:
-                        if (size >= 1) {
+                        if (size >= 1)
                             frameBuffer.bpp = tag->uint32Values[0];
-                        }
+                        else
+                            return -1;
                         break;
                     case MPTIGetPitch:
-                        if (size >= 1) {
+                        if (size >= 1)
                             frameBuffer.pitch = tag->uint32Values[0];
-                        }
+                        else
+                            return -1;
                         break;
                     case MPTIEnd: // End tag.
                         goto END_HANDLE_TAGS; // for safe.
@@ -113,6 +127,7 @@ END_HANDLE_TAGS:
         return 0;
     }
 
+ERROR:
     return -1;
 }
 
