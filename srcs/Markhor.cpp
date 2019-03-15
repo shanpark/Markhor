@@ -20,9 +20,6 @@
 #include "Console.h"
 #include "Test.h"
 
-Console console;
-Gpio gpio;
-
 void Markhor(void) {
     gpio.selectFunction(16, GpioPinFunction::Output);
 
@@ -70,4 +67,6 @@ extern "C" void * _sbrk(int incr) {
 }
 
 extern "C" void abort(void) {
+    while (1)
+        ;
 }

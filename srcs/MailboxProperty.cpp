@@ -39,8 +39,8 @@ Uint32 getFirmwareRevision() {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -67,8 +67,8 @@ Uint32 getBoardModel() {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -95,8 +95,8 @@ Uint32 getBoardRevision() {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -123,8 +123,8 @@ int getBoardMacAddress(Uint8 bufForMac[6]) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -158,8 +158,8 @@ Uint64 getBoardSerial() {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -186,8 +186,8 @@ int getArmMemory(Address * base, Uint64 * size) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -217,8 +217,8 @@ int getVcMemory(Address * base, Uint64 * size) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -254,8 +254,8 @@ int getClocks(int * clockCount, Clock clocks[]) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -299,8 +299,8 @@ int getCommandLine(int * bufLen, char buffer[]) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -336,8 +336,8 @@ Uint32 getDmaChannels() {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -369,8 +369,8 @@ Uint32 getPowerState(DeviceId deviceId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -405,8 +405,8 @@ Uint32 getEnableWaitTime(DeviceId deviceId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -446,8 +446,8 @@ Uint32 setPowerState(DeviceId deviceId, Uint32 state) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -480,8 +480,8 @@ Uint32 getClockState(ClockId clockId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -519,8 +519,8 @@ Uint32 setClockState(ClockId clockId, Uint32 state) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -553,8 +553,8 @@ Uint32 getClockRate(ClockId clockId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -594,8 +594,8 @@ Uint32 setClockRate(ClockId clockId, Uint32 rate, Uint32 skipSettingTurbo) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -628,8 +628,8 @@ Uint32 getMaxClockRate(ClockId clockId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -662,8 +662,8 @@ Uint32 getMinClockRate(ClockId clockId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -696,8 +696,8 @@ Uint32 getTurbo(Uint32 id) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -733,8 +733,8 @@ Uint32 setTurbo(Uint32 id, Uint32 level) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -768,8 +768,8 @@ Uint32 getVoltage(VoltageId voltageId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -805,8 +805,8 @@ Uint32 setVoltage(VoltageId voltageId, Uint32 voltage) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -840,8 +840,8 @@ Uint32 getMaxVoltage(VoltageId voltageId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -875,8 +875,8 @@ Uint32 getMinVoltage(VoltageId voltageId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -910,8 +910,8 @@ Uint32 getTemperature(Uint32 temperatureId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
@@ -945,8 +945,8 @@ Uint32 getMaxTemperature(Uint32 temperatureId) {
 
     mpb->size = ((index + 2) << 2);
 
-    writeToMailbox(CH_PROPERTY_TAGS_ARM_TO_VC, (Uint32)mpb);
-    mpb = (MailboxPropertyBuffer *)readFromMailbox(CH_PROPERTY_TAGS_ARM_TO_VC);
+    mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
+    mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
     if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));

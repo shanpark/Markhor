@@ -21,9 +21,7 @@
 
 #define COLOR   0x07
 
-// Console::Cursor Console::cursor;
-// int Console::width;
-// int Console::height;
+Console console;
 
 int Console::init() {
     if (setupTextMode() != 0)

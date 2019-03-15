@@ -18,7 +18,26 @@
 
 #include "Gpio.h"
 
+#define GPIO_BASE       (IO_PERIPHERALS_BASE + 0x200000UL)
+
+#define GPFSEL_BASE     (GPIO_BASE) // GPIO Function Select
+
+#define GPSET_BASE      (GPIO_BASE + 0x1cUL) // GPIO Pin Output Set
+#define GPCLR_BASE      (GPIO_BASE + 0x28UL) // GPIO Pin Output Clear
+#define GPLEV_BASE      (GPIO_BASE + 0x34UL) // GPIO Pin Level
+#define GPEDS_BASE      (GPIO_BASE + 0x40UL) // GPIO Pin Event Detect Status
+#define GPREN_BASE      (GPIO_BASE + 0x4cUL) // GPIO Pin Rising Edge Detect Enable
+#define GPFEN_BASE      (GPIO_BASE + 0x58UL) // GPIO Pin Falling Edge Detect Enable
+#define GPHEN_BASE      (GPIO_BASE + 0x64UL) // GPIO Pin High Detect Enable
+#define GPLEN_BASE      (GPIO_BASE + 0x70UL) // GPIO Pin Low Detect Enable
+#define GPAREN_BASE     (GPIO_BASE + 0x7cUL) // GPIO Pin Async. Rising Edge Detect
+#define GPAFEN_BASE     (GPIO_BASE + 0x88UL) // GPIO Pin Async. Falling Edge Detect
+#define GPPUD_BASE      (GPIO_BASE + 0x94UL) // GPIO Pin Pull-up/down Enable
+#define GPPUDCLK_BASE   (GPIO_BASE + 0x98UL) // GPIO Pin Pull-up/down Enable Clock
+
 typedef Uint32 GpioRegister;
+
+Gpio gpio;
 
 /**
  * selects a function of a GPIO pins.

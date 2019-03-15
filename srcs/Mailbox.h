@@ -22,50 +22,25 @@
 #include "MarkhorTypes.h"
 #include "IoPeripherals.h"
 
-#define MAILBOX_BASE   (IO_PERIPHERALS_BASE + 0xb880UL)
+enum class MailboxChannel {
+    PowerManagement     = 0,
+    FrameBuffer         = 1, // deprecated.
+    VirtualUart         = 2,
+    Vchiq               = 3,
+    Leds                = 4,
+    Buttons             = 5,
+    TouchScreen         = 6,
+    Unused              = 7,
+    PropertyTagsArmToVc = 8,
+    PropertyTagsVcToArm = 9
+};
 
-/* https://github.com/raspberrypi/firmware/wiki/Mailboxes */
-#define READ_DATA       0
-#define READ_PEEK       4
-#define READ_SENDER     5
-#define READ_STATUS     6
-#define READ_CONFIG     7
-#define WRITE_DATA      8
-#define WRITE_PEEK      12
-#define WRITE_SENDER    13
-#define WRITE_STATUS    14
-#define WRITE_CONFIG    15
+class Mailbox {
+public:
+    Uint32 read(MailboxChannel channel);
+    void write(MailboxChannel channel, Uint32 data);
+};
 
-// This bit is set in the status register if there is no space to write into the mailbox
-#define MAIL_FULL       0x80000000
-// This bit is set in the status register if there is nothing to read from the mailbox
-#define MAIL_EMPTY      0x40000000
-
-typedef enum {
-    CH_POWER_MANAGEMENT = 0,
-    CH_FRAMEBUFFER = 1, // deprecated.
-    CH_VIRTUAL_UART = 2,
-    CH_VCHIQ = 3,
-    CH_LEDS = 4,
-    CH_BUTTONS = 5,
-    CH_TOUCHSCREEN = 6,
-    CH_UNUSED = 7,
-    CH_PROPERTY_TAGS_ARM_TO_VC = 8,
-    CH_PROPERTY_TAGS_VC_TO_ARM = 9
-} MailboxChannel;
-
-typedef Uint32 MailboxRegister;
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-extern Uint32 readFromMailbox(MailboxChannel channel);
-extern void writeToMailbox(MailboxChannel channel, Uint32 data);
-
-#ifdef __cplusplus
-}
-#endif
+extern Mailbox mailbox;
 
 #endif /* __MAILBOX_H */

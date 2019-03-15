@@ -18,6 +18,27 @@
 
 #include "Mailbox.h"
 
+#define MAILBOX_BASE   (IO_PERIPHERALS_BASE + 0xb880UL)
+
+/* https://github.com/raspberrypi/firmware/wiki/Mailboxes */
+#define READ_DATA       0
+#define READ_PEEK       4
+#define READ_SENDER     5
+#define READ_STATUS     6
+#define READ_CONFIG     7
+#define WRITE_DATA      8
+#define WRITE_PEEK      12
+#define WRITE_SENDER    13
+#define WRITE_STATUS    14
+#define WRITE_CONFIG    15
+
+#define MAIL_FULL_BIT   0x80000000
+#define MAIL_EMPTY_BIT  0x40000000
+
+typedef Uint32 MailboxRegister;
+
+Mailbox mailbox;
+
 /**
  * Read data from Mailbox.
  * https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
@@ -25,22 +46,19 @@
  * @param channel target channel
  * @return read data if successful, else -1.
  */
-Uint32 readFromMailbox(MailboxChannel channel) {
-    if (channel > 0x0f)
-        return -1; // 0xffffffff
-
+Uint32 Mailbox::read(MailboxChannel channel) {
     volatile MailboxRegister * mailboxRegister = (MailboxRegister *)MAILBOX_BASE;
 
     while (1) {
         // wait untile mailbox becomes available
-        while ((mailboxRegister[READ_STATUS] & MAIL_EMPTY) != 0)
+        while ((mailboxRegister[READ_STATUS] & MAIL_EMPTY_BIT) != 0)
             ;
 
         // read the value
 		Uint32 data = mailboxRegister[READ_DATA];
 		int readChannel = data & 0x0f;
 
-		if (readChannel == channel)
+		if (readChannel == static_cast<int>(channel))
 			return data & 0xfffffff0UL;
     }
 }
@@ -52,18 +70,15 @@ Uint32 readFromMailbox(MailboxChannel channel) {
  * @param channel target channel
  * @param data data to write.
  */
-void writeToMailbox(MailboxChannel channel, Uint32 data) {
-    if (channel > 0x0f)
-        return;
-
+void Mailbox::write(MailboxChannel channel, Uint32 data) {
     volatile MailboxRegister * mailboxRegister = (MailboxRegister *)MAILBOX_BASE;
 
     // set channel
     data &= ~(0x0f);
-    data |= channel;
+    data |= static_cast<int>(channel);
 
     // wait until the mailbox becomes available
-    while ((mailboxRegister[WRITE_STATUS] & MAIL_FULL) != 0)
+    while ((mailboxRegister[WRITE_STATUS] & MAIL_FULL_BIT) != 0)
         ;
 
     // write the value to the requested channel

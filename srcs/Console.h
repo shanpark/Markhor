@@ -40,4 +40,6 @@ private:
     void gotoNewLine();
 };
 
+extern Console console;
+
 #endif /* __CONSOLE_H */
