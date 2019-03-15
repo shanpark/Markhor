@@ -21,11 +21,20 @@
 
 #include "MarkhorTypes.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern int setupTextMode();
 extern int getTextModeWidth();
 extern int getTextModeHeight();
 extern void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color);
 extern void printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color);
 extern void scrollUp(int lines);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TEXT_EMUL_H */

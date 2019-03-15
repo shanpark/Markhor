@@ -23,7 +23,7 @@ extern void Markhor(void);
 
 #define NOP() asm("nop")
 
-__attribute__((naked))  void StartUp(void) {
+extern "C" __attribute__((naked)) void StartUp(void) {
     int* pos = &__bss_start__;
     int* end = &__bss_end__;
 

@@ -33,7 +33,7 @@ FrameBuffer frameBuffer;
  * @param bpp bit per pixel.
  * @return 0 if successful, -1 if failed.
  */
-int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp) {
+int FrameBuffer::setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp) {
     int index = 0;
     Uint32 params[2];
     
@@ -60,6 +60,12 @@ int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewH
 
     // GetPitch tag
     index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetPitch, 4, 0, 0);
+
+    // GetPixelOrder tag
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetPixelOrder, 4, 0, 0);
+
+    // GetAlphaMode tag
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetAlphaMode, 4, 0, 0);
 
     // End tag
     mpb->tags[index] = MPTIEnd;
@@ -114,6 +120,18 @@ int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewH
                         else
                             return -1;
                         break;
+                    case MPTIGetPixelOrder:
+                        if (size >= 1)
+                            frameBuffer.pixelOrder = static_cast<PixelOrder>(tag->uint32Values[0]);
+                        else
+                            return -1;
+                        break;
+                    case MPTIGetAlphaMode:
+                        if (size >= 1)
+                            frameBuffer.alphaMode = tag->uint32Values[0];
+                        else
+                            return -1;
+                        break;
                     case MPTIEnd: // End tag.
                         goto END_HANDLE_TAGS; // for safe.
                 }
@@ -138,7 +156,7 @@ ERROR:
  * @param state 0 for off, 1 for on.
  * @return 0 for off, 1 for on, -1 for failure.
  */
-Uint32 blankScreen(Uint32 state) {
+Uint32 FrameBuffer::blankScreen(Uint32 state) {
     int index = 0;
     Uint32 params[1];
 
@@ -174,7 +192,13 @@ Uint32 blankScreen(Uint32 state) {
  * @param height
  * @return 0 if successful, -1 for failure.
  */
-int getPhysicalWH(Uint32 * width, Uint32 * height) {
+int FrameBuffer::getPhysicalWH(Uint32 * width, Uint32 * height) {
+    if ((physicalWidth != 0) || (physicalHeight != 0)) {
+        *width = physicalWidth;
+        *height = physicalHeight;
+        return 0;
+    }
+
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -212,7 +236,7 @@ int getPhysicalWH(Uint32 * width, Uint32 * height) {
  * @param height
  * @return 0 if successful, -1 for failure.
  */
-int testPhysicalWH(Uint32 * width, Uint32 * height) {
+int FrameBuffer::testPhysicalWH(Uint32 * width, Uint32 * height) {
     int index = 0;
     Uint32 params[2];
 
@@ -251,7 +275,13 @@ int testPhysicalWH(Uint32 * width, Uint32 * height) {
  * @param height
  * @return 0 if successful, -1 for failure.
  */
-int getVirtualWH(Uint32 * width, Uint32 * height) {
+int FrameBuffer::getVirtualWH(Uint32 * width, Uint32 * height) {
+    if ((virtualWidth != 0) || (virtualHeight != 0)) {
+        *width = virtualWidth;
+        *height = virtualHeight;
+        return 0;
+    }
+
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -289,7 +319,7 @@ int getVirtualWH(Uint32 * width, Uint32 * height) {
  * @param height
  * @return 0 if successful, -1 for failure.
  */
-int testVirtualWH(Uint32 * width, Uint32 * height) {
+int FrameBuffer::testVirtualWH(Uint32 * width, Uint32 * height) {
     int index = 0;
     Uint32 params[2];
 
@@ -327,7 +357,7 @@ int testVirtualWH(Uint32 * width, Uint32 * height) {
  * @param depth 
  * @return 0 if successful, -1 for failure.
  */
-int getDepth(Uint32 * depth) {
+int FrameBuffer::getDepth(Uint32 * depth) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -363,7 +393,7 @@ int getDepth(Uint32 * depth) {
  * @param depth
  * @return 0 if successful, -1 for failure.
  */
-int testDepth(Uint32 * depth) {
+int FrameBuffer::testDepth(Uint32 * depth) {
     int index = 0;
     Uint32 params[1];
 
@@ -396,9 +426,9 @@ int testDepth(Uint32 * depth) {
 }
 
 /**
- * @return 0 if BGR, 1 if RGB, -1 for failure.
+ * @return 0 if successful, -1 if failed.
  */
-Uint32 getPixelOrder() {
+int FrameBuffer::getPixelOrder(PixelOrder * pixelOrder) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -420,7 +450,8 @@ Uint32 getPixelOrder() {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
         if ((tag->id == MPTIGetPixelOrder) && 
             (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4)) {
-            return tag->uint32Values[0];
+            *pixelOrder = static_cast<PixelOrder>(tag->uint32Values[0]);
+            return 0;
         }
     }
 
@@ -428,12 +459,13 @@ Uint32 getPixelOrder() {
 }
 
 /**
+ * 
  * @return 0x0: Alpha channel enabled (0 = fully opaque)
  *         0x1: Alpha channel reversed (0 = fully transparent)
  *         0x2: Alpha channel ignored.
  *         -1 for failure.
  */
-Uint32 getAlphaMode() {
+int FrameBuffer::getAlphaMode(Uint32 * alphaMode) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -455,7 +487,8 @@ Uint32 getAlphaMode() {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
         if ((tag->id == MPTIGetAlphaMode) && 
             (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4)) {
-            return tag->uint32Values[0];
+            *alphaMode = tag->uint32Values[0];
+            return 0;
         }
     }
 
@@ -463,9 +496,9 @@ Uint32 getAlphaMode() {
 }
 
 /**
- * @return bytes per line, -1 for failure.
+ * @return 0 if successful, -1 if failed.
  */
-Uint32 getPitch() {
+int FrameBuffer::getPitch(Uint32 * pitch) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -487,7 +520,8 @@ Uint32 getPitch() {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
         if ((tag->id == MPTIGetPitch) && 
             (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4)) {
-            return tag->uint32Values[0];
+            *pitch = tag->uint32Values[0];
+            return 0;
         }
     }
 
@@ -499,7 +533,7 @@ Uint32 getPitch() {
  * @param y
  * @return 0 if successful, -1 for failure.
  */
-int getVirtualOffset(Uint32 * x, Uint32 * y) {
+int FrameBuffer::getVirtualOffset(Uint32 * x, Uint32 * y) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -536,7 +570,7 @@ int getVirtualOffset(Uint32 * x, Uint32 * y) {
  * @param y
  * @return 0 if successful, -1 for failure.
  */
-int setVirtualOffset(Uint32 * x, Uint32 * y) {
+int FrameBuffer::setVirtualOffset(Uint32 * x, Uint32 * y) {
     int index = 0;
     Uint32 params[2];
 
@@ -579,7 +613,7 @@ int setVirtualOffset(Uint32 * x, Uint32 * y) {
  * @param palette must be Uint32[256] size or more.
  * @return 0 if success, -1 for failure.
  */
-int getPalette(Uint32 * palette) {
+int FrameBuffer::getPalette(Uint32 * palette) {
     int index = 0;
 
     MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
@@ -618,7 +652,7 @@ int getPalette(Uint32 * palette) {
  * @param palette 0x00RRGGBB 포맷의 color값의 배열이다.
  * @return 0 if valid, 1 if invalid, -1 for failure.
  */
-int setPalette(Uint32 offset, Uint32 length, Uint32 palette[]) {
+int FrameBuffer::setPalette(Uint32 offset, Uint32 length, Uint32 palette[]) {
     int index = 0;
     Uint32 params[2];
 

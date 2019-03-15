@@ -16,24 +16,29 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
+#include "Gpio.h"
 #include "Console.h"
+#include "Test.h"
+
+Console console;
+Gpio gpio;
 
 void Markhor(void) {
-    consoleInit();
+    gpio.selectFunction(16, GpioPinFunction::Output);
+
+    if (console.init() == 0)
+        gpio.clearOutputPin(16);
 
     for (int inx = 0 ; inx < 67 ; inx++) {
-
         for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
-            consoleWrite("Hello\tWorld\t", 12);
+            console.write((char *)"Hello\tWorld\t", 12);
 
-        consoleWrite("New\n", 4);
+        console.write((char *)"New\n", 4);
 
         for (int d = 0 ; d < 1000000 ; d++)
             asm ( "NOP" );
     }
 
-    // setupDisplay();
     // testPalette();
     // printFrameBufferInfo();
     // printHardwareInfo();
@@ -51,7 +56,7 @@ void Markhor(void) {
  * NOT complete function. must be rewritten.
  */
 extern char _end;
-void * _sbrk(int incr) {
+extern "C" void * _sbrk(int incr) {
     static char * heap_end = &_end;
     char * prev_heap_end;
 
@@ -62,4 +67,7 @@ void * _sbrk(int incr) {
      heap_end += incr;
 
      return (void *)prev_heap_end;
+}
+
+extern "C" void abort(void) {
 }

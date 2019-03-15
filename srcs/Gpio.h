@@ -39,28 +39,29 @@
 #define GPPUD_BASE      (GPIO_BASE + 0x94UL) // GPIO Pin Pull-up/down Enable
 #define GPPUDCLK_BASE   (GPIO_BASE + 0x98UL) // GPIO Pin Pull-up/down Enable Clock
 
-typedef Uint32 GpioRegister;
+enum class GpioPinFunction {
+    Input    = 0,
+    Output   = 1,
+    Alt0     = 4,
+    Alt1     = 5,
+    Alt2     = 6,
+    Alt3     = 7,
+    Alt4     = 3,
+    Alt5     = 2
+};
 
-typedef enum {
-    GPFInput    = 0,
-    GPFOutput   = 1,
-    GPFAlt0     = 4,
-    GPFAlt1     = 5,
-    GPFAlt2     = 6,
-    GPFAlt3     = 7,
-    GPFAlt4     = 3,
-    GPFAlt5     = 2
-} GpioPinFunction;
+enum class GpioPinValue {
+    Err  = -1,
+    Lo   = 0,
+    Hi   = 1
+};
 
-typedef enum {
-    GPVErr  = -1,
-    GPVLo   = 0,
-    GPVHi   = 1
-} GpioPinValue;
-
-extern int gpioSelectFunction(Uint32 pin, GpioPinFunction func);
-extern int gpioSetOutputPin(Uint32 pin);
-extern int gpioClearOutputPin(Uint32 pin);
-extern GpioPinValue gpioGetPinValue(Uint32 pin);
+class Gpio {
+public:
+    int selectFunction(Uint32 pin, GpioPinFunction func);
+    int setOutputPin(Uint32 pin);
+    int clearOutputPin(Uint32 pin);
+    GpioPinValue getPinValue(Uint32 pin);
+};
 
 #endif /* __GPIO_H */

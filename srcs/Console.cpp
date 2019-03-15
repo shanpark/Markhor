@@ -21,23 +21,19 @@
 
 #define COLOR   0x07
 
-static Cursor cursor = { 0, 0 };
-static int width, height;
+// Console::Cursor Console::cursor;
+// int Console::width;
+// int Console::height;
 
-static void gotoNewLine();
-
-int consoleInit() {
+int Console::init() {
     if (setupTextMode() != 0)
         return -1;
-
-    cursor.x = 0;
-    cursor.y = 0;
 
     width = getTextModeWidth();
     height = getTextModeHeight();
 }
 
-int consoleWrite(char * str, int length) {
+int Console::write(char * str, int length) {
     for (int inx = 0 ; inx < length ; inx++) {
         if (str[inx] == '\t') {
             cursor.x = (cursor.x + 8) & 0xfffffff8;
@@ -54,7 +50,7 @@ int consoleWrite(char * str, int length) {
     }
 }
 
-void gotoNewLine() {
+void Console::gotoNewLine() {
     cursor.x = 0;
     if (cursor.y == height - 1)
         scrollUp(1);

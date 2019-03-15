@@ -56,7 +56,16 @@ typedef enum {
 
 typedef Uint32 MailboxRegister;
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern Uint32 readFromMailbox(MailboxChannel channel);
 extern void writeToMailbox(MailboxChannel channel, Uint32 data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MAILBOX_H */

@@ -18,6 +18,8 @@
 
 #include "Gpio.h"
 
+typedef Uint32 GpioRegister;
+
 /**
  * selects a function of a GPIO pins.
  * 
@@ -25,26 +27,26 @@
  * @param func Function to seelct (0 ~ 7)
  * @return 0 if successful. else -1.
  */
-int gpioSelectFunction(Uint32 pin, GpioPinFunction func) {
-    if ((pin > 54) || (func > 8))
+int Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
+    if (pin > 54)
         return -1;
 
     GpioRegister * gpfselRegister = &((GpioRegister *)GPFSEL_BASE)[pin / 10];
     GpioRegister temp = *gpfselRegister;
     temp &= ~(0x00000007 << ((pin % 10) * 3));
-    temp |= (func << ((pin % 10) * 3));
+    temp |= (static_cast<Uint32>(func) << ((pin % 10) * 3));
     *gpfselRegister = temp;
 
     return 0;
 }
-
+   
 /**
- * set a GPIO pin.
+ * set a GPIO output pin.
  * 
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int gpioSetOutputPin(Uint32 pin) {
+int Gpio::setOutputPin(Uint32 pin) {
     if (pin > 54)
         return -1;
 
@@ -55,12 +57,12 @@ int gpioSetOutputPin(Uint32 pin) {
 }
 
 /**
- * clear a GPIO pin.
+ * clear a GPIO output pin.
  * 
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int gpioClearOutputPin(Uint32 pin) {
+int Gpio::clearOutputPin(Uint32 pin) {
     if (pin > 54)
         return -1;
 
@@ -76,13 +78,13 @@ int gpioClearOutputPin(Uint32 pin) {
  * @param pin Pin number. (0 ~ 53)
  * @return 1 = high, 0 = low. -1 = failure.
  */
-GpioPinValue gpioGetPinValue(Uint32 pin) {
+GpioPinValue Gpio::getPinValue(Uint32 pin) {
     if (pin > 54)
-        return GPVErr;
+        return GpioPinValue::Err;
 
     GpioRegister * gplevRegister = &((GpioRegister *)GPLEV_BASE)[pin / 32];
     if (*gplevRegister & (1 << (pin % 32)))
-        return GPVHi;
+        return GpioPinValue::Hi;
 
-    return GPVLo;
+    return GpioPinValue::Lo;
 }

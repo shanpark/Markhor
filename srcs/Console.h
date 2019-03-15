@@ -19,12 +19,25 @@
 #ifndef __CONSOLE_H
 #define __CONSOLE_H
 
-typedef struct {
-    int x;
-    int y;
-} Cursor;
+class Console {
+private:
+    class Cursor {
+    public:
+        Cursor() : x(0), y(0) {};
 
-extern int consoleInit();
-extern int consoleWrite(char * str, int length);
+        int x;
+        int y;
+    };
+
+    Cursor cursor;
+    int width, height;
+
+public:
+    int init();
+    int write(char * str, int length);
+
+private:
+    void gotoNewLine();
+};
 
 #endif /* __CONSOLE_H */

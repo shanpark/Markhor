@@ -195,6 +195,11 @@ typedef struct {
 
 extern Uint32 bufferForMailbox[1024] __attribute__((aligned(16)));
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern Uint32 getFirmwareRevision();
 extern Uint32 getBoardModel();
 extern Uint32 getBoardRevision();
@@ -224,5 +229,9 @@ extern Uint32 getTemperature(Uint32 temperatureId);
 extern Uint32 getMaxTemperature(Uint32 temperatureId);
 
 extern int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MAILBOX_PROPERTY_H */
