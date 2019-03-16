@@ -19,6 +19,8 @@
 #ifndef __CONSOLE_H
 #define __CONSOLE_H
 
+#include "ResultCode.h"
+
 class Console {
 private:
     class Cursor {
@@ -33,7 +35,7 @@ private:
     int width, height;
 
 public:
-    int init();
+    ResultCode init();
     int write(char * str, int length);
 
 private:

@@ -20,7 +20,7 @@
 #define __GPIO_H
 
 #include "MarkhorTypes.h"
-#include "IoPeripherals.h"
+#include "ResultCode.h"
 
 enum class GpioPinFunction {
     Input    = 0,
@@ -41,9 +41,9 @@ enum class GpioPinValue {
 
 class Gpio {
 public:
-    int selectFunction(Uint32 pin, GpioPinFunction func);
-    int setOutputPin(Uint32 pin);
-    int clearOutputPin(Uint32 pin);
+    ResultCode selectFunction(Uint32 pin, GpioPinFunction func);
+    ResultCode setOutputPin(Uint32 pin);
+    ResultCode clearOutputPin(Uint32 pin);
     GpioPinValue getPinValue(Uint32 pin);
 };
 

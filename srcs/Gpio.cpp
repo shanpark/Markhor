@@ -16,6 +16,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "IoPeripherals.h"
 #include "Gpio.h"
 
 #define GPIO_BASE       (IO_PERIPHERALS_BASE + 0x200000UL)
@@ -46,9 +47,10 @@ Gpio gpio;
  * @param func Function to seelct (0 ~ 7)
  * @return 0 if successful. else -1.
  */
-int Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
+ResultCode Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
     if (pin > 54)
-        return -1;
+        return ResultCode::InvalidParameter;
+
 
     GpioRegister * gpfselRegister = &((GpioRegister *)GPFSEL_BASE)[pin / 10];
     GpioRegister temp = *gpfselRegister;
@@ -56,7 +58,7 @@ int Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
     temp |= (static_cast<Uint32>(func) << ((pin % 10) * 3));
     *gpfselRegister = temp;
 
-    return 0;
+    return ResultCode::Success;
 }
    
 /**
@@ -65,14 +67,14 @@ int Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int Gpio::setOutputPin(Uint32 pin) {
+ResultCode Gpio::setOutputPin(Uint32 pin) {
     if (pin > 54)
-        return -1;
+        return ResultCode::InvalidParameter;
 
     GpioRegister * gpsetRegister = &((GpioRegister *)GPSET_BASE)[pin / 32];
     *gpsetRegister = 1 << (pin % 32);
 
-    return 0;
+    return ResultCode::Success;
 }
 
 /**
@@ -81,14 +83,14 @@ int Gpio::setOutputPin(Uint32 pin) {
  * @param pin Pin number. (0 ~ 53)
  * @return 0 if successful. else -1.
  */
-int Gpio::clearOutputPin(Uint32 pin) {
+ResultCode Gpio::clearOutputPin(Uint32 pin) {
     if (pin > 54)
-        return -1;
+        return ResultCode::InvalidParameter;
 
     GpioRegister * gpclrRegister = &((GpioRegister *)GPCLR_BASE)[pin / 32];
     *gpclrRegister = 1 << (pin % 32);
 
-    return 0;
+    return ResultCode::Success;
 }
 
 /**

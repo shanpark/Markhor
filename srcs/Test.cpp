@@ -16,11 +16,12 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
+// #include <stdio.h>
+#include <string.h>
 #include "Gpio.h"
 #include "MailboxProperty.h"
 #include "FrameBuffer.h"
-#include "Display.h"
+#include "Console.h"
 #include "Test.h"
 
 // #define WIDTH   1680
@@ -40,36 +41,39 @@ static Uint32 data;
 static char buf[512];
 static Uint32 temp[256];
 
-void setupDisplay() {
-    Gpio gpio;
+// void setupDisplay() {
+//     Gpio gpio;
     
-    gpio.selectFunction(16, GpioPinFunction::Output);
+//     gpio.selectFunction(16, GpioPinFunction::Output);
 
-    if (frameBuffer.setupFrameBuffer(WIDTH, HEIGHT, WIDTH, HEIGHT, DEPTH) == 0)
-        gpio.clearOutputPin(16);
-    else
-        gpio.setOutputPin(16);
-}
-
-// void testPalette() {
-//     if (DEPTH == 8) {
-//         data = setPalette(0, sizeof(palette) / sizeof(Uint32), palette);
-//         if (data >= 0)
-//             sprintf(buf, "Set Palette: %u", data); // 0=valid, 1=invalid
-//         else
-//             sprintf(buf, "Set Palette: fail");
-//         putString(0, y++, buf, COLOR);
-
-//         if (getPalette(temp) == 0) {
-//             if ((palette[6] == temp[6]) && (palette[7] == temp[7]))
-//                 sprintf(buf, "Get Palette: OK");
-//             else
-//                 sprintf(buf, "Get Palette: NOK [%08X, %08X, %08X, %08X, %08X, %08X, %08X, %08X]", temp[8], temp[9], temp[10], temp[11], temp[12], temp[13], temp[14], temp[15]);
-//         } else
-//             sprintf(buf, "Get Palette: fail");
-//         putString(0, y++, buf, COLOR);
-//     }
+//     if (frameBuffer.setupFrameBuffer(WIDTH, HEIGHT, WIDTH, HEIGHT, DEPTH) == 0)
+//         gpio.clearOutputPin(16);
+//     else
+//         gpio.setOutputPin(16);
 // }
+
+void testPalette() {
+    ResultCode result;
+    if (DEPTH == 8) {
+        // result = frameBuffer.setPalette(0, sizeof(palette) / sizeof(Uint32), palette);
+        // if (result == ResultCode::Success)
+        //     sprintf(buf, "Set Palette: Success\n");
+        // else if (result == ResultCode::InvalidParameter)
+        //     sprintf(buf, "Set Palette: Invalid\n");
+        // else
+        //     sprintf(buf, "Set Palette: fail\n");
+        // console.write(buf, strlen(buf));
+
+        // if (frameBuffer.getPalette(temp) == ResultCode::Success) {
+        //     if ((palette[6] == temp[6]) && (palette[7] == temp[7]))
+        //         sprintf(buf, "Get Palette: OK\n");
+        //     else
+        //         sprintf(buf, "Get Palette: NOK [%08X, %08X, %08X, %08X, %08X, %08X, %08X, %08X]\n", temp[8], temp[9], temp[10], temp[11], temp[12], temp[13], temp[14], temp[15]);
+        // } else
+        //     sprintf(buf, "Get Palette: fail\n");
+        // console.write(buf, strlen(buf));
+    }
+}
 
 // void printFrameBufferInfo() {
 //     sprintf(buf, "Frame Buffer Base:%08X, End:%08X, Size:%08X, Bpp:%d, Pitch:%d", frameBuffer.base, frameBuffer.end, frameBuffer.end - frameBuffer.base, frameBuffer.bpp, frameBuffer.pitch);
@@ -79,42 +83,44 @@ void setupDisplay() {
 //     putString(0, y++, buf, COLOR);
 // }
 
-// void printHardwareInfo() {
-//     data = getFirmwareRevision();
-//     if (data != (Uint32)(-1))
-//         sprintf(buf, "Firmware Revision: %08X", data);
-//     else
-//         sprintf(buf, "Firmware Revision: fail");
-//     putString(0, y++, buf, COLOR);
+void printHardwareInfo() {
+    // if (mailboxProperty.getFirmwareRevision(&data) == ResultCode::Success)
+    //     sprintf(buf, "Firmware Revision: %08X\n", data);
+    // else
+    //     sprintf(buf, "Firmware Revision: fail\n");
+    // strcpy(buf, "Firmware Revision: fail\n");
+    // console.write(buf, strlen(buf));
 
-//     data = getBoardModel();
-//     if (data != (Uint32)(-1))
-//         sprintf(buf, "Board Model: %08X", data);
-//     else
-//         sprintf(buf, "Board Model: fail");
-//     putString(0, y++, buf, COLOR);
+    // if (mailboxProperty.getBoardModel(&data) == ResultCode::Success)
+    //     sprintf(buf, "Board Model: %08X\n", data);
+    // else
+    //     sprintf(buf, "Board Model: fail\n");
+    // strcpy(buf, "Firmware Revision: fail\n");
+    // console.write(buf, strlen(buf));
 
-//     data = getBoardRevision();
-//     if (data != (Uint32)(-1))
-//         sprintf(buf, "Board Revision: %08X", data);
-//     else
-//         sprintf(buf, "Board Revision: fail");
-//     putString(0, y++, buf, COLOR);
+    // if (mailboxProperty.getBoardRevision(&data) == ResultCode::Success)
+    //     sprintf(buf, "Board Revision: %08X\n", data);
+    // else
+    //     sprintf(buf, "Board Revision: fail\n");
+    // strcpy(buf, "Firmware Revision: fail\n");
+    // console.write(buf, strlen(buf));
 
-//     Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-//     if (getBoardMacAddress(mac) == 0)
-//         sprintf(buf, "Board MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-//     else
-//         sprintf(buf, "Board MAC Address: fail");
-//     putString(0, y++, buf, COLOR);
+    // Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    // if (mailboxProperty.getBoardMacAddress(mac) == ResultCode::Success)
+    //     sprintf(buf, "Board MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    // else
+    //     sprintf(buf, "Board MAC Address: fail\n");
+    // strcpy(buf, "Firmware Revision: fail\n");
+    // console.write(buf, strlen(buf));
 
-//     Uint64 data64 = getBoardSerial();
-//     if (data64 != (Uint64)(-1))
-//         sprintf(buf, "Board Serial: %llu", data64);
-//     else
-//         sprintf(buf, "Board Serial: fail");
-//     putString(0, y++, buf, COLOR);
-// }
+    // Uint64 data64;
+    // if (mailboxProperty.getBoardSerial(&data64) == ResultCode::Success)
+    //     sprintf(buf, "Board Serial: %llu\n", data64);
+    // else
+    //     sprintf(buf, "Board Serial: fail\n");
+    // strcpy(buf, "Firmware Revision: fail\n");
+    // console.write(buf, strlen(buf));
+}
 
 // void printHwMemoryInfo() {
 //     Address base;
@@ -329,21 +335,20 @@ void setupDisplay() {
 //     putString(0, y++, buf, COLOR);
 // }
 
-// void printTemperature() {
-//     Uint32 temperature = getTemperature(0);
-//     if (temperature != (Uint32)(-1))
-//         sprintf(buf, "Temperatore: %u", temperature);
-//     else
-//         sprintf(buf, "Temperatore]: fail");
-//     putString(0, y++, buf, COLOR);
+void printTemperature() {
+    Uint32 temperature;
+    // if (mailboxProperty.getTemperature(0, &temperature) == ResultCode::Success)
+    //     sprintf(buf, "Temperatore: %u\n", temperature);
+    // else
+    //     sprintf(buf, "Temperatore: fail\n");
+    // console.write(buf, strlen(buf));
 
-//     temperature = getMaxTemperature(0);
-//     if (temperature != (Uint32)(-1))
-//         sprintf(buf, "Temperatore Max: %u", temperature);
-//     else
-//         sprintf(buf, "Temperatore Max: fail");
-//     putString(0, y++, buf, COLOR);
-// }
+    // if (mailboxProperty.getMaxTemperature(0, &temperature) == ResultCode::Success)
+    //     sprintf(buf, "Temperatore Max: %u\n", temperature);
+    // else
+    //     sprintf(buf, "Temperatore Max: fail\n");
+    // console.write(buf, strlen(buf));
+}
 
 // void testDisplayInfo() {
 //     // blankScreen(1);

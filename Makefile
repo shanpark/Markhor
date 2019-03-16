@@ -23,9 +23,10 @@ BUILDDIR = build
 
 # Compiler flags
 CFLAGS = -O2 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
-CPPFLAGS = -O2 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c
+CPPFLAGS = -O2 -mfpu=vfp -mfloat-abi=softfp -march=armv6zk -mtune=arm1176jzf-s -c -fno-rtti -fno-exceptions -ffreestanding
 #CFLAGS = -O0 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7-a -mtune=cortex-a7 -c
-LDFLAGS = -Wno-undef -nostartfiles -T kernel.ld -lstdc++
+#LDFLAGS = -Wno-undef -nostartfiles -T kernel.ld -nostdlib -nodefaultlibs
+LDFLAGS = -Wno-undef -nostartfiles -T kernel.ld 
 #LDFLAGS = -Wl,-verbose
 ASFLAGS = -mfpu=vfp -I $(SRCDIR)
 
@@ -68,7 +69,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(BUILDDIR)
 
 # Rule to make the object files for C sources.
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp $(BUILDDIR)
-	$(CC) $(CFLAGS) $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 # Rule to make the object files for Assembly sources.
 $(BUILDDIR)/%.o: $(SRCDIR)/%.s $(BUILDDIR)

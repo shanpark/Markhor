@@ -23,16 +23,20 @@
 
 Console console;
 
-int Console::init() {
-    if (setupTextMode() != 0)
-        return -1;
+ResultCode Console::init() {
+    ResultCode resultCode = textEmul.setupTextMode();
+    if (resultCode != ResultCode::Success)
+        return resultCode;
 
-    width = getTextModeWidth();
-    height = getTextModeHeight();
+    width = textEmul.getWidth();
+    height = textEmul.getHeight();
+
+    return ResultCode::Success;
 }
 
 int Console::write(char * str, int length) {
-    for (int inx = 0 ; inx < length ; inx++) {
+    int inx;
+    for (inx = 0 ; inx < length ; inx++) {
         if (str[inx] == '\t') {
             cursor.x = (cursor.x + 8) & 0xfffffff8;
             if (cursor.x >= width)
@@ -40,18 +44,20 @@ int Console::write(char * str, int length) {
         } else if (str[inx] == '\n') {
                 gotoNewLine();
         } else {
-            printCharAt(cursor.x, cursor.y, str[inx], COLOR);
+            textEmul.printCharAt(cursor.x, cursor.y, str[inx], COLOR);
             cursor.x++;
             if (cursor.x >= width)
                 gotoNewLine();
         }
     }
+
+    return inx;
 }
 
 void Console::gotoNewLine() {
     cursor.x = 0;
     if (cursor.y == height - 1)
-        scrollUp(1);
+        textEmul.scrollUp(1);
     else
         cursor.y++;
 }

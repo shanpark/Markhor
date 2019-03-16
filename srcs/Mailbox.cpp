@@ -16,6 +16,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "IoPeripherals.h"
 #include "Mailbox.h"
 
 #define MAILBOX_BASE   (IO_PERIPHERALS_BASE + 0xb880UL)
@@ -36,6 +37,8 @@
 #define MAIL_EMPTY_BIT  0x40000000
 
 typedef Uint32 MailboxRegister;
+
+Uint32 Mailbox::buffer[BUFFER_SIZE >> 2] __attribute__((aligned(16)));
 
 Mailbox mailbox;
 

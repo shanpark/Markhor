@@ -16,11 +16,14 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __DISPLAY_H
-#define __DISPLAY_H
+#ifndef __RESULT_CODE_H
+#define __RESULT_CODE_H
 
-extern void setPixel(Uint32 x, Uint32 y, Uint32 color);
-extern void putChar(Uint32 x, Uint32 y, Uint32 ascii, Uint32 color);
-extern void putString(Uint32 x, Uint32 y, char *str, Uint32 color);
+enum class ResultCode {
+    Success             = 0,
+    Fail                = -1,
+    AlreadyInUse        = -2,
+    InvalidParameter    = -3,
+};
 
-#endif /* __DISPLAY_H */
+#endif /* __RESULT_CODE_H */

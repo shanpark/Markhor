@@ -21,7 +21,7 @@
  * 8 depth로 emulate 하도록 한다.
  */
 
-#include <string.h>
+#include <string.h> // library code size = 820 bytes.
 #include "FrameBuffer.h"
 #include "TextEmul.h"
 
@@ -30,45 +30,35 @@
 #define FONT_WIDTH      8   // do not change.
 #define FONT_HEIGHT     16  // do not change. 
 
-extern Uint8 font[4096];
-
-typedef struct {
-    int width;
-    int height;
-} TextModeInfo;
-
-static const int screenWidth = 1920, screenHeight = 1080; // 16:9
-// static const int screenWidth = 1680, screenHeight = 1050; // 16:10
-static TextModeInfo textModeInfo;
-static Uint32 palette[16] = { // format = 0x00bbggrr
-    0x00000000, 0x00000080, 0x00008000, 0x00008080, 0x00800000, 0x00800080, 0x00808000, 0x00c0c0c0,
-    0x00808080, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff };
-
 #define BACK_COLOR  0x00
 #define FORE_COLOR  0x07
 
-int setupTextMode() {
-    if (frameBuffer.setupFrameBuffer(screenWidth, screenHeight, screenWidth, screenHeight, SCREEN_DEPTH) != 0)
-        return -1;
+extern Uint8 font[4096];
+
+static const int screenWidth = 1920, screenHeight = 1080; // 16:9
+// static const int screenWidth = 1680, screenHeight = 1050; // 16:10
+
+TextEmul textEmul;
+
+Uint32 TextEmul::palette[16] = { // format = 0x00bbggrr
+    0x00000000, 0x00000080, 0x00008000, 0x00008080, 0x00800000, 0x00800080, 0x00808000, 0x00c0c0c0,
+    0x00808080, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff };
+
+ResultCode TextEmul::setupTextMode() {
+    ResultCode resultCode = frameBuffer.setupFrameBuffer(screenWidth, screenHeight, screenWidth, screenHeight, SCREEN_DEPTH);
+    if (resultCode != ResultCode::Success)
+        return resultCode;
 
     frameBuffer.setPalette(0, sizeof(palette) / sizeof(palette[0]), palette);
 
-    textModeInfo.width = screenWidth / FONT_WIDTH;
-    textModeInfo.height = screenHeight / FONT_HEIGHT;
+    width = screenWidth / FONT_WIDTH;
+    height = screenHeight / FONT_HEIGHT;
 
-    return 0;
+    return ResultCode::Success;
 }
 
-int getTextModeWidth() {
-    return textModeInfo.width;
-}
-
-int getTextModeHeight() {
-    return textModeInfo.height;
-}
-
-void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color) {
-    if ((x >= textModeInfo.width) || (y >= textModeInfo.height) || (ascii < 0))
+void TextEmul::printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color) {
+    if ((x >= width) || (y >= height) || (ascii < 0))
         return; // do nothing.
 
     int fontOffset = ascii * FONT_HEIGHT;
@@ -103,19 +93,19 @@ void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color) {
     }
 }
 
-void printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color) {
+void TextEmul::printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color) {
     char * pos = str;
     char * end = pos + length;
-    for (int inx = x ; (inx < textModeInfo.width) && (pos < end) ; inx++)
+    for (int inx = x ; (inx < width) && (pos < end) ; inx++)
         printCharAt(inx, y, *pos++, color);
 }
 
-void scrollUp(int lines) {
-    memcpy((void *)frameBuffer.getBase(), 
-        (void *)(frameBuffer.getBase() + (frameBuffer.getPitch() * FONT_HEIGHT * lines)), 
-        (textModeInfo.height - lines) * (frameBuffer.getPitch() * FONT_HEIGHT));
+void TextEmul::scrollUp(int lines) {
+    memcpy((Uint8 *)frameBuffer.getBase(), 
+        (Uint8 *)(frameBuffer.getBase() + (frameBuffer.getPitch() * FONT_HEIGHT * lines)), 
+        (height - lines) * (frameBuffer.getPitch() * FONT_HEIGHT));
 
-    memset((void *)(frameBuffer.getBase() + ((textModeInfo.height - lines) * (frameBuffer.getPitch() * FONT_HEIGHT))), 
-        BACK_COLOR, 
+    memset((Uint8 *)(frameBuffer.getBase() + ((height - lines) * (frameBuffer.getPitch() * FONT_HEIGHT))), 
+        (Uint8)BACK_COLOR, 
         (frameBuffer.getPitch() * FONT_HEIGHT) * lines);
 }

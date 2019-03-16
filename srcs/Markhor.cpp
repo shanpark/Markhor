@@ -23,8 +23,8 @@
 void Markhor(void) {
     gpio.selectFunction(16, GpioPinFunction::Output);
 
-    if (console.init() == 0)
-        gpio.clearOutputPin(16);
+    if (console.init() == ResultCode::Success) // if successful
+        gpio.clearOutputPin(16); // turn LED on.
 
     for (int inx = 0 ; inx < 67 ; inx++) {
         for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
@@ -36,16 +36,16 @@ void Markhor(void) {
             asm ( "NOP" );
     }
 
-    // testPalette();
+    testPalette();
     // printFrameBufferInfo();
-    // printHardwareInfo();
+    printHardwareInfo();
     // printHwMemoryInfo();
     // testClock();
     // printCommandLine();
     // printDmaState();
     // testDevicePower();
     // printVoltageInfo();
-    // printTemperature();
+    printTemperature();
     // testDisplayInfo();
 }
 
@@ -64,9 +64,4 @@ extern "C" void * _sbrk(int incr) {
      heap_end += incr;
 
      return (void *)prev_heap_end;
-}
-
-extern "C" void abort(void) {
-    while (1)
-        ;
 }

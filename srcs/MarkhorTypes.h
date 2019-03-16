@@ -19,7 +19,7 @@
 #ifndef __MARKHOR_TYPES_H
 #define __MARKHOR_TYPES_H
 
-#include <stdint.h>
+#include <cstdint>
 
 typedef int8_t      Int8;
 typedef uint8_t     Uint8;

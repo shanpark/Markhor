@@ -20,21 +20,24 @@
 #define __TEXT_EMUL_H
 
 #include "MarkhorTypes.h"
+#include "ResultCode.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+class TextEmul {
+private:
+    static Uint32 palette[16];
 
-extern int setupTextMode();
-extern int getTextModeWidth();
-extern int getTextModeHeight();
-extern void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color);
-extern void printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color);
-extern void scrollUp(int lines);
+    int width;
+    int height;
 
-#ifdef __cplusplus
-}
-#endif
+public:
+    ResultCode setupTextMode();
+    int getWidth() { return width; }
+    int getHeight() { return height; }
+    void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color);
+    void printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color);
+    void scrollUp(int lines);
+};
+
+extern TextEmul textEmul;
 
 #endif /* __TEXT_EMUL_H */

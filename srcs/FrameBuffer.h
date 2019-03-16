@@ -20,6 +20,7 @@
 #define __FRAME_BUFFER_H
 
 #include "MarkhorTypes.h"
+#include "ResultCode.h"
 
 enum class PixelOrder {
     BGR = 0x00,
@@ -42,7 +43,7 @@ private:
 public:
     FrameBuffer() : base(0), end(0), physicalWidth(0), physicalHeight(0), virtualWidth(0), virtualHeight(0), bpp(0), pitch(0), pixelOrder(PixelOrder::BGR), alphaMode(0) {}
 
-    int setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp);
+    ResultCode setupFrameBuffer(Uint32 width, Uint32 height, Uint32 viewWidth, Uint32 viewHeight, Uint32 bpp);
 
     Address getBase() { return base; }
     Address getEnd() { return end; }
@@ -56,27 +57,20 @@ public:
     PixelOrder getPixelOrder() { return pixelOrder; }
     Uint32 getAlphaMode() { return alphaMode; }
 
-    Uint32 blankScreen(Uint32 state);
-
-    int getPhysicalWH(Uint32 * width, Uint32 * height);
-    int testPhysicalWH(Uint32 * width, Uint32 * height);
-
-    int getVirtualWH(Uint32 * width, Uint32 * height);
-    int testVirtualWH(Uint32 * width, Uint32 * height);
-
-    int getDepth(Uint32 * depth);
-    int testDepth(Uint32 * depth);
-
-    int getPixelOrder(PixelOrder * pixelOrder);
-    int getAlphaMode(Uint32 * alphaMode);
-
-    int getPitch(Uint32 * pitch);
-
-    int getVirtualOffset(Uint32 * x, Uint32 * y);
-    int setVirtualOffset(Uint32 * x, Uint32 * y);
-
-    int getPalette(Uint32 * palette);
-    int setPalette(Uint32 offset, Uint32 length, Uint32 palette[]);
+    ResultCode blankScreen(Uint32 * state);
+    ResultCode getPhysicalWH(Uint32 * width, Uint32 * height);
+    ResultCode testPhysicalWH(Uint32 * width, Uint32 * height);
+    ResultCode getVirtualWH(Uint32 * width, Uint32 * height);
+    ResultCode testVirtualWH(Uint32 * width, Uint32 * height);
+    ResultCode getDepth(Uint32 * depth);
+    ResultCode testDepth(Uint32 * depth);
+    ResultCode getPixelOrder(PixelOrder * pixelOrder);
+    ResultCode getAlphaMode(Uint32 * alphaMode);
+    ResultCode getPitch(Uint32 * pitch);
+    ResultCode getVirtualOffset(Uint32 * x, Uint32 * y);
+    ResultCode setVirtualOffset(Uint32 * x, Uint32 * y);
+    ResultCode getPalette(Uint32 * palette);
+    ResultCode setPalette(Uint32 offset, Uint32 length, Uint32 palette[]);
 };
 
 extern FrameBuffer frameBuffer;

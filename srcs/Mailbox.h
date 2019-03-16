@@ -20,7 +20,6 @@
 #define __MAILBOX_H
 
 #include "MarkhorTypes.h"
-#include "IoPeripherals.h"
 
 enum class MailboxChannel {
     PowerManagement     = 0,
@@ -36,7 +35,14 @@ enum class MailboxChannel {
 };
 
 class Mailbox {
+private:
+#define BUFFER_SIZE  (4 * 1024)
+    static Uint32 buffer[BUFFER_SIZE >> 2];
+
 public:
+    Uint32 *lockBuffer() { return buffer; /* TODO should implement lock system. */ }
+    void unlockBuffer() { /* TODO should implement lock system. */ }
+
     Uint32 read(MailboxChannel channel);
     void write(MailboxChannel channel, Uint32 data);
 };

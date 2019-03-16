@@ -20,21 +20,21 @@
 #include "Mailbox.h"
 #include "MailboxProperty.h"
 
-#define BUFFER_SIZE  (4 * 1024)
+MailboxProperty mailboxProperty;
 
-Uint32 bufferForMailbox[BUFFER_SIZE >> 2] __attribute__((aligned(16)));
-
-Uint32 getFirmwareRevision() {
+ResultCode MailboxProperty::getFirmwareRevision(Uint32 * firmwareVersion) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetFirmwareRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetFirmwareRevision, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetFirmwareRevision, 4, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -42,27 +42,32 @@ Uint32 getFirmwareRevision() {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetFirmwareRevision) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
-            return tag->uint32Values[0];
+        if ((tag->id == MailboxPropertyTagId::GetFirmwareRevision) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 4))
+            *firmwareVersion = tag->uint32Values[0];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-Uint32 getBoardModel() {
+ResultCode MailboxProperty::getBoardModel(Uint32 * boardModel) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardModel tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardModel, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetBoardModel, 4, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -70,27 +75,32 @@ Uint32 getBoardModel() {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetBoardModel) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
-            return tag->uint32Values[0];
+        if ((tag->id == MailboxPropertyTagId::GetBoardModel) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 4))
+            *boardModel = tag->uint32Values[0];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-Uint32 getBoardRevision() {
+ResultCode MailboxProperty::getBoardRevision(Uint32 * boardRevision) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardRevision, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetBoardRevision, 4, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -98,27 +108,32 @@ Uint32 getBoardRevision() {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetBoardRevision) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
-            return tag->uint32Values[0];
+        if ((tag->id == MailboxPropertyTagId::GetBoardRevision) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 4))
+            *boardRevision = tag->uint32Values[0];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-int getBoardMacAddress(Uint8 bufForMac[6]) {
+ResultCode MailboxProperty::getBoardMacAddress(Uint8 bufForMac[6]) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetMacAddress tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardMacAddress, 6, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetBoardMacAddress, 6, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -126,34 +141,38 @@ int getBoardMacAddress(Uint8 bufForMac[6]) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetBoardMacAddress) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 6)) {
+        if ((tag->id == MailboxPropertyTagId::GetBoardMacAddress) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 6)) {
             bufForMac[0] = tag->uint8Values[0];
             bufForMac[1] = tag->uint8Values[1];
             bufForMac[2] = tag->uint8Values[2];
             bufForMac[3] = tag->uint8Values[3];
             bufForMac[4] = tag->uint8Values[4];
             bufForMac[5] = tag->uint8Values[5];
-            return 0;
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-Uint64 getBoardSerial() {
+ResultCode MailboxProperty::getBoardSerial(Uint64 * boardSerial) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetBoardSerial, 8, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetBoardSerial, 8, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -161,27 +180,33 @@ Uint64 getBoardSerial() {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetBoardSerial) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8))
-            return tag->uint64Values[0];
+        if ((tag->id == MailboxPropertyTagId::GetBoardSerial) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *boardSerial = tag->uint64Values[0];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
+        }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-int getArmMemory(Address * base, Uint64 * size) {
+ResultCode MailboxProperty::getArmMemory(Address * base, Uint64 * size) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetArmMemory, 8, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetArmMemory, 8, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -189,30 +214,34 @@ int getArmMemory(Address * base, Uint64 * size) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetArmMemory) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+        if ((tag->id == MailboxPropertyTagId::GetArmMemory) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
             *base = (Address)tag->uint32Values[0];
             *size = (Uint64)tag->uint32Values[1];
-            return 0;
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-int getVcMemory(Address * base, Uint64 * size) {
+ResultCode MailboxProperty::getVcMemory(Address * base, Uint64 * size) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetVcMemory, 8, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetVcMemory, 8, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -220,20 +249,22 @@ int getVcMemory(Address * base, Uint64 * size) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetVcMemory) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
+        if ((tag->id == MailboxPropertyTagId::GetVcMemory) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
             *base = (Address)tag->uint32Values[0];
             *size = (Uint64)tag->uint32Values[1];
-            return 0;
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-int getClocks(int * clockCount, Clock clocks[]) {
+ResultCode MailboxProperty::getClocks(int * clockCount, Clock clocks[]) {
     int index = 0;
 
     // too big buffer size. adjust to inner buffer size. 6 = buffer header + tag header + null tag
@@ -242,14 +273,16 @@ int getClocks(int * clockCount, Clock clocks[]) {
 
     int bufSize = (*clockCount << 3);
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetClocks, bufSize, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetClocks, bufSize, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -257,28 +290,31 @@ int getClocks(int * clockCount, Clock clocks[]) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetClocks) && 
-            (tag->code & MPTCResponseTagCodeBit)) {
-            Uint32 valueSize = tag->code & MPTCResponseTagCodeSizeBits;
+        if ((tag->id == MailboxPropertyTagId::GetClocks) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit)) {
+            Uint32 valueSize = tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits;
             *clockCount = (valueSize >> 3);                
             if (valueSize <= bufSize) {
                 for (int valueIndex = 0, clockIndex = 0 ; clockIndex < *clockCount ; clockIndex++) {
-                    clocks[clockIndex].parentId = tag->uint32Values[valueIndex++];
-                    clocks[clockIndex].id = tag->uint32Values[valueIndex++];
+                    clocks[clockIndex].parentId = static_cast<ClockId>(tag->uint32Values[valueIndex++]);
+                    clocks[clockIndex].id = static_cast<ClockId>(tag->uint32Values[valueIndex++]);
                 }
-                return 0;
+                mailbox.unlockBuffer();
+                return ResultCode::Success;
             } else {
-                return -2; // Not enough buffer space
+                mailbox.unlockBuffer();
+                return ResultCode::AlreadyInUse; // Not enough buffer space
             }
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-int getCommandLine(int * bufLen, char buffer[]) {
+ResultCode MailboxProperty::getCommandLine(int * bufLen, char buffer[]) {
     int index = 0;
 
     // too big buffer size. adjust to inner buffer size. 6 = buffer header + tag header + null tag
@@ -287,14 +323,16 @@ int getCommandLine(int * bufLen, char buffer[]) {
 
     int bufSize = *bufLen & 0xfffffffc;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetBoardRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetCommandLine, bufSize, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetCommandLine, bufSize, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -302,36 +340,41 @@ int getCommandLine(int * bufLen, char buffer[]) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetCommandLine) && 
-            (tag->code & MPTCResponseTagCodeBit)) {
-            Uint32 valueSize = tag->code & MPTCResponseTagCodeSizeBits;
+        if ((tag->id == MailboxPropertyTagId::GetCommandLine) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit)) {
+            Uint32 valueSize = tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits;
             *bufLen = valueSize;
             if (valueSize <= bufSize) {
-                memcpy(buffer, tag->uint8Values, valueSize);
-                return 0;
+                memcpy(buffer, (char *)tag->uint8Values, valueSize);
+                mailbox.unlockBuffer();
+                return ResultCode::Success;
             } else {
                 *bufLen = ((valueSize + 3) & 0xfffffffc); // align 32bit.
-                return -2; // Not enough buffer space
+                mailbox.unlockBuffer();
+                return ResultCode::AlreadyInUse; // Not enough buffer space
             }
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
-Uint32 getDmaChannels() {
+ResultCode MailboxProperty::getDmaChannels(Uint32 & dmaChannel) {
     int index = 0;
     
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetFirmwareRevision tag
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetDmaChannels, 4, 0, 0);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetDmaChannels, 4, 0, 0);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -339,32 +382,38 @@ Uint32 getDmaChannels() {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetDmaChannels) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 4))
-            return tag->uint32Values[0];
+        if ((tag->id == MailboxPropertyTagId::GetDmaChannels) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 4)) {
+            dmaChannel = tag->uint32Values[0];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
+        }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return device power state. -1 for failure.
  */
-Uint32 getPowerState(DeviceId deviceId) {
+ResultCode MailboxProperty::getPowerState(DeviceId deviceId, Uint32 * powerState) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = deviceId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetPowerState, 8, 1, params);
+    params[0] = static_cast<Uint32>(deviceId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetPowerState, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -372,15 +421,18 @@ Uint32 getPowerState(DeviceId deviceId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetPowerState) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetPowerState) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *powerState = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -388,19 +440,21 @@ Uint32 getPowerState(DeviceId deviceId) {
  * @return wait time required after turning a device on before power is stable. Returns 0 wait time if the device does not exist.
  *         -1 for failure.
  */
-Uint32 getEnableWaitTime(DeviceId deviceId) {
+ResultCode MailboxProperty::getEnableWaitTime(DeviceId deviceId, Uint32 * enableWaitTime) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetEnableWaitTime tag
-    params[0] = deviceId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetEnableWaitTime, 8, 1, params);
+    params[0] = static_cast<Uint32>(deviceId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetEnableWaitTime, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -408,14 +462,18 @@ Uint32 getEnableWaitTime(DeviceId deviceId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetEnableWaitTime) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8))
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetEnableWaitTime) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *enableWaitTime = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
+        }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -423,25 +481,27 @@ Uint32 getEnableWaitTime(DeviceId deviceId) {
  * 문서와 달리 request state값에서 Bit0의 값이 0일 때 On이 되고 1일 때 Off가 됨.
  * 
  * @param deviceId
- * @param state Bit 0: 0=off, 1=on. 문서에는 이렇게 되어있으나 0을 줘야 on상태로 바뀐다.???
+ * @param state Bit 0: 0=off, 1=on. (unlike the document, zero make it turn on.)
  *              Bit 1: 0=do not wait, 1=wait
  *              Bits 2-31: reserved for future use (set to 0)
  * @return new state, with/without waiting for the power to become stable.
  */
-Uint32 setPowerState(DeviceId deviceId, Uint32 state) {
+ResultCode MailboxProperty::setPowerState(DeviceId deviceId, Uint32 * state) {
     int index = 0;
     Uint32 params[2];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = deviceId;
-    params[1] = state;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetPowerState, 8, 2, params);
+    params[0] = static_cast<Uint32>(deviceId);
+    params[1] = *state;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::SetPowerState, 8, 2, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -449,33 +509,38 @@ Uint32 setPowerState(DeviceId deviceId, Uint32 state) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTISetPowerState) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::SetPowerState) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *state = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return clock state. -1 for failure.
  */
-Uint32 getClockState(ClockId clockId) {
+ResultCode MailboxProperty::getClockState(ClockId clockId, Uint32 * clockState) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetClockState, 8, 1, params);
+    params[0] = static_cast<Uint32>(clockId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetClockState, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -483,15 +548,18 @@ Uint32 getClockState(ClockId clockId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetClockState) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetClockState) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *clockState = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -501,20 +569,22 @@ Uint32 getClockState(ClockId clockId) {
  *              Bits 2-31: reserved for future use (set to 0)
  * @return new clock state
  */
-Uint32 setClockState(ClockId clockId, Uint32 state) {
+ResultCode MailboxProperty::setClockState(ClockId clockId, Uint32 * state) {
     int index = 0;
     Uint32 params[2];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    params[1] = state;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetClockState, 8, 2, params);
+    params[0] = static_cast<Uint32>(clockId);
+    params[1] = *state;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::SetClockState, 8, 2, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -522,33 +592,38 @@ Uint32 setClockState(ClockId clockId, Uint32 state) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTISetClockState) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::SetClockState) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *state = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return clock rate in Hz. 0 if clock does not exist. -1 for failure.
  */
-Uint32 getClockRate(ClockId clockId) {
+ResultCode MailboxProperty::getClockRate(ClockId clockId, Uint32 * clockRate) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetClockRate, 8, 1, params);
+    params[0] = static_cast<Uint32>(clockId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetClockRate, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -556,15 +631,18 @@ Uint32 getClockRate(ClockId clockId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetClockRate) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetClockRate) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *clockRate =  tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -575,21 +653,23 @@ Uint32 getClockRate(ClockId clockId) {
  *        by setting "skip setting turbo" to 1.
  * @return clock rate in hz.
  */
-Uint32 setClockRate(ClockId clockId, Uint32 rate, Uint32 skipSettingTurbo) {
+ResultCode MailboxProperty::setClockRate(ClockId clockId, Uint32 * rate, Uint32 skipSettingTurbo) {
     int index = 0;
     Uint32 params[3];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    params[1] = rate;
+    params[0] = static_cast<Uint32>(clockId);
+    params[1] = *rate;
     params[2] = skipSettingTurbo;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetClockRate, 12, 3, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::SetClockRate, 12, 3, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -597,33 +677,38 @@ Uint32 setClockRate(ClockId clockId, Uint32 rate, Uint32 skipSettingTurbo) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTISetClockRate) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::SetClockRate) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *rate = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return the maximum supported clock rate for the given clock. -1 for failure.
  */
-Uint32 getMaxClockRate(ClockId clockId) {
+ResultCode MailboxProperty::getMaxClockRate(ClockId clockId, Uint32 * maxClockRate) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMaxClockRate, 8, 1, params);
+    params[0] = static_cast<Uint32>(clockId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetMaxClockRate, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -631,33 +716,38 @@ Uint32 getMaxClockRate(ClockId clockId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetMaxClockRate) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetMaxClockRate) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *maxClockRate = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return the minimum supported clock rate for the given clock. -1 for failure.
  */
-Uint32 getMinClockRate(ClockId clockId) {
+ResultCode MailboxProperty::getMinClockRate(ClockId clockId, Uint32 * minClockRate) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = clockId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMinClockRate, 8, 1, params);
+    params[0] = static_cast<Uint32>(clockId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetMinClockRate, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -665,33 +755,38 @@ Uint32 getMinClockRate(ClockId clockId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetMinClockRate) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetMinClockRate) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *minClockRate = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return the turbo state for index id. level will be 0 for non-turbo and 1 for turbo. -1 for failure.
  */
-Uint32 getTurbo(Uint32 id) {
+ResultCode MailboxProperty::getTurbo(Uint32 id, Uint32 * level) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
     params[0] = id;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetTurbo, 8, 1, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetTurbo, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -699,15 +794,18 @@ Uint32 getTurbo(Uint32 id) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetTurbo) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetTurbo) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *level = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -715,20 +813,22 @@ Uint32 getTurbo(Uint32 id) {
  * @param level 0 for non-turbo and 1 for turbo.
  * @return the turbo state for index id. level will be 0 for non-turbo and 1 for turbo. -1 for failure.
  */
-Uint32 setTurbo(Uint32 id, Uint32 level) {
+ResultCode MailboxProperty::setTurbo(Uint32 id, Uint32 * level) {
     int index = 0;
     Uint32 params[2];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
     params[0] = id;
-    params[1] = level;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetTurbo, 8, 2, params);
+    params[1] = *level;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::SetTurbo, 8, 2, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -736,34 +836,39 @@ Uint32 setTurbo(Uint32 id, Uint32 level) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTISetTurbo) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::SetTurbo) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *level = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return offset from 1.2V in units of 0.025V. 0x80000000 for invalid voltage id. -1 for failure.
  *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
  */
-Uint32 getVoltage(VoltageId voltageId) {
+ResultCode MailboxProperty::getVoltage(VoltageId voltageId, Uint32 * voltage) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = voltageId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetVoltage, 8, 1, params);
+    params[0] = static_cast<Uint32>(voltageId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetVoltage, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -771,15 +876,18 @@ Uint32 getVoltage(VoltageId voltageId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetVoltage) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetVoltage) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *voltage = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
@@ -787,20 +895,22 @@ Uint32 getVoltage(VoltageId voltageId) {
  * @param voltage offset from 1.2V in units of 0.025V.
  * @return offset from 1.2V in units of 0.025V. 0x80000000 for invalid voltage id. -1 for failure.
  */
-Uint32 setVoltage(VoltageId voltageId, Uint32 voltage) {
+ResultCode MailboxProperty::setVoltage(VoltageId voltageId, Uint32 * voltage) {
     int index = 0;
     Uint32 params[2];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
-    params[0] = voltageId;
-    params[1] = voltage;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTISetVoltage, 8, 2, params);
+    params[0] = static_cast<Uint32>(voltageId);
+    params[1] = *voltage;
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::SetVoltage, 8, 2, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -808,34 +918,39 @@ Uint32 setVoltage(VoltageId voltageId, Uint32 voltage) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTISetVoltage) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::SetVoltage) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *voltage = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return the maximum supported voltage rate for the given id. -1 for failure.
  *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
  */
-Uint32 getMaxVoltage(VoltageId voltageId) {
+ResultCode MailboxProperty::getMaxVoltage(VoltageId voltageId, Uint32 * maxVoltage) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetMaxVoltage tag
-    params[0] = voltageId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMaxVoltage, 8, 1, params);
+    params[0] = static_cast<Uint32>(voltageId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetMaxVoltage, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -843,34 +958,39 @@ Uint32 getMaxVoltage(VoltageId voltageId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetMaxVoltage) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetMaxVoltage) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *maxVoltage = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @return the minimum supported voltage rate for the given id. -1 for failure.
  *         실제 테스트 결과. offset이 아니라 micro volt 단위의 값이 나오는 것으로 판단됨.
  */
-Uint32 getMinVoltage(VoltageId voltageId) {
+ResultCode MailboxProperty::getMinVoltage(VoltageId voltageId, Uint32 * minVoltage) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetMinVoltage tag
-    params[0] = voltageId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMinVoltage, 8, 1, params);
+    params[0] = static_cast<Uint32>(voltageId);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetMinVoltage, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -878,34 +998,42 @@ Uint32 getMinVoltage(VoltageId voltageId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetMinVoltage) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetMinVoltage) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *minVoltage = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
+ * the temperature of the SoC
+ * 
  * @param temperatureId should be zero.
+ * @param temperature the temperature of the SoC. (degree * 1000)
  * @return Return the temperature of the SoC in thousandths of a degree C (degree * 1000). -1 for failure.
  */
-Uint32 getTemperature(Uint32 temperatureId) {
+ResultCode MailboxProperty::getTemperature(Uint32 temperatureId, Uint32 * temperature) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetPowerState tag
     params[0] = temperatureId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetTemperature, 8, 1, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetTemperature, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -913,34 +1041,39 @@ Uint32 getTemperature(Uint32 temperatureId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetTemperature) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetTemperature) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *temperature = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 /**
  * @param temperatureId should be zero.
  * @return Return the temperature of the SoC in thousandths of a degree C (degree * 1000). -1 for failure.
  */
-Uint32 getMaxTemperature(Uint32 temperatureId) {
+ResultCode MailboxProperty::getMaxTemperature(Uint32 temperatureId, Uint32 * maxTemperature) {
     int index = 0;
     Uint32 params[1];
 
-    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)bufferForMailbox;
-    mpb->code = MPICRequestCode;
+    MailboxPropertyBuffer * mpb = (MailboxPropertyBuffer *)mailbox.lockBuffer();
+    if (mpb == nullptr)
+        return ResultCode::AlreadyInUse;
+    mpb->code = MailboxPropertyInterfaceCode::RequestCode;
 
     // GetMaxVoltage tag
     params[0] = temperatureId;
-    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MPTIGetMaxTemperature, 8, 1, params);
+    index += fillMailboxRequestTagInfo((MailboxPropertyTag *)&(mpb->tags[index]), MailboxPropertyTagId::GetMaxTemperature, 8, 1, params);
 
     // End tag
-    mpb->tags[index] = MPTIEnd;
+    mpb->tags[index] = static_cast<Uint32>(MailboxPropertyTagId::End);
     index++;
 
     mpb->size = ((index + 2) << 2);
@@ -948,15 +1081,18 @@ Uint32 getMaxTemperature(Uint32 temperatureId) {
     mailbox.write(MailboxChannel::PropertyTagsArmToVc, (Uint32)mpb);
     mpb = (MailboxPropertyBuffer *)mailbox.read(MailboxChannel::PropertyTagsArmToVc);
 
-    if ((mpb->code & MPICResponseCodeBit) && ((mpb->code & MPICResponseCodeErrorBit) == 0)) {
+    if ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeBit) && ((mpb->code & MailboxPropertyInterfaceCode::ResponseCodeErrorBit) == 0)) {
         MailboxPropertyTag * tag = ((MailboxPropertyTag *)&(mpb->tags[0]));
-        if ((tag->id == MPTIGetMaxTemperature) && 
-            (tag->code & MPTCResponseTagCodeBit) && ((tag->code & MPTCResponseTagCodeSizeBits) >= 8)) {
-            return tag->uint32Values[1];
+        if ((tag->id == MailboxPropertyTagId::GetMaxTemperature) && 
+            (tag->code & MailboxPropertyTagCode::ResponseTagCodeBit) && ((tag->code & MailboxPropertyTagCode::ResponseTagCodeSizeBits) >= 8)) {
+            *maxTemperature = tag->uint32Values[1];
+            mailbox.unlockBuffer();
+            return ResultCode::Success;
         }
     }
 
-    return -1;
+    mailbox.unlockBuffer();
+    return ResultCode::Fail;
 }
 
 // following functions not implemented.
@@ -972,10 +1108,10 @@ Uint32 getMaxTemperature(Uint32 temperatureId) {
  * Fill Mailbox request tag structure. Support only tags with 32 bit data values.
  * @return Total count of the filled 32bit data
  */
-int fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, Uint32 id, Uint32 size, Uint32 paramCount, Uint32 param[]) {
+int MailboxProperty::fillMailboxRequestTagInfo(MailboxPropertyTag *tagBuf, MailboxPropertyTagId id, Uint32 size, Uint32 paramCount, Uint32 param[]) {
     tagBuf->id = id;
     tagBuf->size = (size + 3) & 0xfffffffcUL; // align size to 32bits.
-    tagBuf->code = MPTCRequestTagCode;
+    tagBuf->code = MailboxPropertyTagCode::RequestTagCode;
     for (int inx = 0 ; inx < paramCount ; inx++)
         tagBuf->uint32Values[inx] = param[inx];
 
