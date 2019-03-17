@@ -20,6 +20,7 @@
 #include "CLib.h"
 
 /**
+ * Simple version of vsprintf()
  * Following format specifiers are supported.
  * format specifier: %, c, s, d, i, o, X, u
  * 
@@ -76,6 +77,7 @@ int vsprintf(char * buf, const char * format, va_list vlist) {
 }
 
 /**
+ * Simple version of sprintf()
  * Following format specifiers are supported.
  * format specifier: %, c, s, d, i, o, X, u
  * 
