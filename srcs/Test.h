@@ -33,5 +33,7 @@ extern void printHardwareInfo();
 // extern void printVoltageInfo();
 extern void printTemperature();
 // extern void testDisplayInfo();
+extern void testItoa();
+extern void testSprintf();
 
 #endif /* __TEST_H */

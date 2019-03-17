@@ -34,7 +34,7 @@ ResultCode Console::init() {
     return ResultCode::Success;
 }
 
-int Console::write(char * str, int length) {
+int Console::write(const char * str, int length) {
     int inx;
     for (inx = 0 ; inx < length ; inx++) {
         if (str[inx] == '\t') {

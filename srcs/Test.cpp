@@ -16,12 +16,12 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// #include <stdio.h>
-#include <string.h>
+#include <cstring>
 #include "Gpio.h"
 #include "MailboxProperty.h"
 #include "FrameBuffer.h"
 #include "Console.h"
+#include "CLib.h"
 #include "Test.h"
 
 // #define WIDTH   1680
@@ -430,3 +430,126 @@ void printTemperature() {
 //         sprintf(buf, "Set Virtual Offset: fail");
 //     putString(0, y++, buf, COLOR);
 // }
+
+void testItoa() {
+    // char buf[8];
+
+    // char * p = itoa(1234, buf, 8, 10);
+    // console.write("1234=", 5);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(-1234, buf, 8, 10);
+    // console.write("-1234=", 6);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(1234567, buf, 8, 10);
+    // console.write("1234567=", 8);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(12345678, buf, 8, 10);
+    // console.write("12345678=", 8);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(-123456, buf, 8, 10);
+    // console.write("-123456=", 8);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(-1234567, buf, 8, 10);
+    // console.write("-1234567=", 9);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(0x1234, buf, 8, 16);
+    // console.write("1234=", 5);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(-0x1234, buf, 8, 16);
+    // console.write("-1234=", 6);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(0x1234567, buf, 8, 16);
+    // console.write("1234567=", 8);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(0x12345678, buf, 8, 16);
+    // console.write("12345678=", 9);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1); 
+
+    // p = itoa(-0x123456, buf, 8, 16);
+    // console.write("-123456=", 8);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+
+    // p = itoa(-0x1234567, buf, 8, 16);
+    // console.write("-1234567=", 9);
+    // if (p)
+    //     console.write(p, strlen(p));
+    // else
+    //     console.write("fail", 4);
+    // console.write("\n", 1);
+}
+
+void testSprintf() {
+    sprintf(buf, "%%=%c\n", '%');
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "1234=%d\n", 1234);
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "-1234=%d\n", -1234);
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "4294967295=%u\n", -1);
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "37777777777=%o\n", -1);
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "FFFFFFFF=%x\n", -1);
+    console.write(buf, strlen(buf));
+
+    sprintf(buf, "string=%s\n", "string");
+    console.write(buf, strlen(buf));
+}

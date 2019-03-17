@@ -21,7 +21,7 @@
  * 8 depth로 emulate 하도록 한다.
  */
 
-#include <string.h> // library code size = 820 bytes.
+#include <cstring>
 #include "FrameBuffer.h"
 #include "TextEmul.h"
 

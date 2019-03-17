@@ -36,7 +36,7 @@ enum class MailboxChannel {
 
 class Mailbox {
 private:
-#define BUFFER_SIZE  (4 * 1024)
+#define BUFFER_SIZE  (4 * 512)
     static Uint32 buffer[BUFFER_SIZE >> 2];
 
 public:

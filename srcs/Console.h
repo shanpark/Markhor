@@ -36,7 +36,7 @@ private:
 
 public:
     ResultCode init();
-    int write(char * str, int length);
+    int write(const char * str, int length);
 
 private:
     void gotoNewLine();

@@ -16,8 +16,10 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cstring>
 #include "Gpio.h"
 #include "Console.h"
+#include "CLib.h"
 #include "Test.h"
 
 void Markhor(void) {
@@ -26,42 +28,44 @@ void Markhor(void) {
     if (console.init() == ResultCode::Success) // if successful
         gpio.clearOutputPin(16); // turn LED on.
 
-    for (int inx = 0 ; inx < 67 ; inx++) {
-        for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
-            console.write((char *)"Hello\tWorld\t", 12);
+    // for (int inx = 0 ; inx < 67 ; inx++) {
+    //     for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
+    //         console.write((char *)"Hello\tWorld\t", 12);
 
-        console.write((char *)"New\n", 4);
+    //     console.write((char *)"New\n", 4);
 
-        for (int d = 0 ; d < 1000000 ; d++)
-            asm ( "NOP" );
-    }
+    //     for (int d = 0 ; d < 1000000 ; d++)
+    //         asm ( "NOP" );
+    // }
 
-    testPalette();
+    // testPalette();
     // printFrameBufferInfo();
-    printHardwareInfo();
+    // printHardwareInfo();
     // printHwMemoryInfo();
     // testClock();
     // printCommandLine();
     // printDmaState();
     // testDevicePower();
     // printVoltageInfo();
-    printTemperature();
+    // printTemperature();
     // testDisplayInfo();
+    // testItoa();
+    testSprintf();
 }
 
 /**
  * NOT complete function. must be rewritten.
  */
-extern char _end;
-extern "C" void * _sbrk(int incr) {
-    static char * heap_end = &_end;
-    char * prev_heap_end;
+// extern char _end;
+// extern "C" void * _sbrk(int incr) {
+//     static char * heap_end = &_end;
+//     char * prev_heap_end;
 
-    // if (heap_end == 0)
-    //     heap_end = &_end;
+//     // if (heap_end == 0)
+//     //     heap_end = &_end;
 
-     prev_heap_end = heap_end;
-     heap_end += incr;
+//      prev_heap_end = heap_end;
+//      heap_end += incr;
 
-     return (void *)prev_heap_end;
-}
+//      return (void *)prev_heap_end;
+// }
