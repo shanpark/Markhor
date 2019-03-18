@@ -16,19 +16,18 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.section ".init"
+#ifndef __INTERRUPT_H
+#define __INTERRUPT_H
 
-.global _start
+class Interrupt {
+public:
+    static void reset(void) __attribute__((interrupt("ABORT")));
+    static void undefinedInstruction(void) __attribute__((interrupt("UNDEF")));
+    static void software(void) __attribute__((interrupt("SWI")));
+    static void prefetchAbort(void) __attribute__((interrupt("ABORT")));
+    static void dataAbort(void) __attribute__((interrupt("ABORT")));
+    static void interruptRequest(void) __attribute__((interrupt("IRQ")));
+    static void fastInterruptRequest(void) __attribute__((interrupt("FIQ")));
+};
 
-_start:
-    mov sp, #0x8000
-    b   StartUp
-
-.global _enable_interrupts
-
-_enable_interrupts:
-    mrs r0, cpsr
-    bic r0, r0, #0x80
-    msr cpsr_c, r0
-
-    mov pc, lr
+#endif /* __INTERRUPT_H */

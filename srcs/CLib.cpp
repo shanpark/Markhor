@@ -87,10 +87,9 @@ int vsprintf(char * buf, const char * format, va_list vlist) {
  */
 int sprintf(char * buf, const char * format, ...) {
     va_list arg;
-    int written;
     
     va_start(arg, format);
-    written = vsprintf(buf, format, arg);
+    int written = vsprintf(buf, format, arg);
     va_end(arg);
 
     return written;

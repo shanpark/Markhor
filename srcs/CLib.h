@@ -22,10 +22,6 @@
 #include <cstdarg>
 #include "MarkhorTypes.h"
 
-inline bool isdigit(int n) {
-    return ((n >= '0') && (n <= '9')) ? true : false;
-}
-
 /**
  * This is for signed integer type.
  * The result is right aligned in the buffer. And 

@@ -16,19 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.section ".init"
+#ifndef __INIT_H
+#define __INIT_H
 
-.global _start
+extern "C" void _enable_interrupts(void);
 
-_start:
-    mov sp, #0x8000
-    b   StartUp
-
-.global _enable_interrupts
-
-_enable_interrupts:
-    mrs r0, cpsr
-    bic r0, r0, #0x80
-    msr cpsr_c, r0
-
-    mov pc, lr
+#endif /* __INIT_H */
