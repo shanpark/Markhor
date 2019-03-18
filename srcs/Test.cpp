@@ -22,6 +22,7 @@
 #include "FrameBuffer.h"
 #include "Console.h"
 #include "CLib.h"
+#include "Interrupt.h"
 #include "Test.h"
 
 // #define WIDTH   1680
@@ -531,25 +532,37 @@ void testItoa() {
     // console.write("\n", 1);
 }
 
-void testSprintf() {
-    sprintf(buf, "%%=%c\n", '%');
-    console.write(buf, strlen(buf));
+// void testSprintf() {
+//     sprintf(buf, "%%=%c\n", '%');
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "1234=%d\n", 1234);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "1234=%d\n", 1234);
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "-1234=%d\n", -1234);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "-1234=%d\n", -1234);
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "4294967295=%u\n", -1);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "4294967295=%u\n", -1);
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "37777777777=%o\n", -1);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "37777777777=%o\n", -1);
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "FFFFFFFF=%x\n", -1);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "FFFFFFFF=%x\n", -1);
+//     console.write(buf, strlen(buf));
 
-    sprintf(buf, "string=%s\n", "string");
+//     sprintf(buf, "string=%s\n", "string");
+//     console.write(buf, strlen(buf));
+// }
+
+void dumpIVT() {
+    Uint32 * ivt = (Uint32 *)0x0004;
+
+    sprintf(buf, "0x________ 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
+    console.write(buf, strlen(buf));
+    ivt = (Uint32 *)0x0020;
+    sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
+    console.write(buf, strlen(buf));
+    sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", reset, undefinedInstruction, software, prefetchAbort, dataAbort, interruptRequest, fastInterruptRequest);
     console.write(buf, strlen(buf));
 }

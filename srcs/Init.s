@@ -15,20 +15,55 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 .section ".init"
 
+/**
+ * entry point 
+ */
 .global _start
-
 _start:
+    /* initialize interrupt vector table */
+    mov r0, #0x8000 
+    add r0, #_interruptVectorTable
+    mov r1, #0x0000
+    ldmia r0!, { r2, r3, r4, r5, r6, r7, r8, r9 } /* copy vector entries: 8 words */
+    stmia r1!, { r2, r3, r4, r5, r6, r7, r8, r9 }
+    ldmia r0!, { r2, r3, r4, r5, r6, r7, r8 } /* copy handler addresses: 7 words */
+    stmia r1!, { r2, r3, r4, r5, r6, r7, r8 }
+
+    /* initialize stack */
     mov sp, #0x8000
+
+    /* branch to StartUp */
     b   StartUp
 
-.global _enable_interrupts
+/* Interrupt Vector Table Entries */
+_interruptVectorTable:
+    ldr pc, resetAddr
+    ldr pc, undefinedInstructionAddr
+    ldr pc, softwareAddr
+    ldr pc, prefetchAbortAddr
+    ldr pc, dataAbortAddr
+    nop
+    ldr pc, interruptRequestAddr
+    ldr pc, fastInterruptRequestAddr
 
-_enable_interrupts:
-    mrs r0, cpsr
-    bic r0, r0, #0x80
-    msr cpsr_c, r0
+/* Interrupt Handler Addresses */
+resetAddr:                   .word reset
+undefinedInstructionAddr:    .word undefinedInstruction
+softwareAddr:                .word software
+prefetchAbortAddr:           .word prefetchAbort
+dataAbortAddr:               .word dataAbort
+interruptRequestAddr:        .word interruptRequest
+fastInterruptRequestAddr:    .word fastInterruptRequest
 
-    mov pc, lr
+@ /**
+@  * enableInterrupts() function definition
+@  */
+@ .global _enableInterruptRequest
+@ _enableInterruptRequest:
+@     mrs r0, cpsr
+@     bic r0, r0, #0x80
+@     msr cpsr_c, r0
+
+@     mov pc, lr

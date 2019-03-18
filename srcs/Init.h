@@ -19,6 +19,6 @@
 #ifndef __INIT_H
 #define __INIT_H
 
-extern "C" void _enable_interrupts(void);
+// extern "C" void _enableInterruptRequest(void);
 
 #endif /* __INIT_H */

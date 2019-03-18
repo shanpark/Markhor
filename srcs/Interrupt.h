@@ -19,15 +19,17 @@
 #ifndef __INTERRUPT_H
 #define __INTERRUPT_H
 
-class Interrupt {
-public:
-    static void reset(void) __attribute__((interrupt("ABORT")));
-    static void undefinedInstruction(void) __attribute__((interrupt("UNDEF")));
-    static void software(void) __attribute__((interrupt("SWI")));
-    static void prefetchAbort(void) __attribute__((interrupt("ABORT")));
-    static void dataAbort(void) __attribute__((interrupt("ABORT")));
-    static void interruptRequest(void) __attribute__((interrupt("IRQ")));
-    static void fastInterruptRequest(void) __attribute__((interrupt("FIQ")));
-};
+extern void enableInterruptRequest(void);
+extern void enableFastInterruptRequest(void);
+
+extern "C" {
+    void reset(void) __attribute__((interrupt("ABORT")));
+    void undefinedInstruction(void) __attribute__((interrupt("UNDEF")));
+    void software(void) __attribute__((interrupt("SWI")));
+    void prefetchAbort(void) __attribute__((interrupt("ABORT")));
+    void dataAbort(void) __attribute__((interrupt("ABORT")));
+    void interruptRequest(void) __attribute__((interrupt("IRQ")));
+    void fastInterruptRequest(void) __attribute__((interrupt("FIQ")));
+}
 
 #endif /* __INTERRUPT_H */

@@ -18,37 +18,49 @@
 
 #include "Interrupt.h"
 
-void __attribute__((interrupt("ABORT"))) Interrupt::reset(void) {
+void enableInterruptRequest(void) {
+    asm ("mrs r0, cpsr");
+    asm ("bic r0, r0, #0x80");
+    asm ("msr cpsr_c, r0");
+}
+
+void enableFastInterruptRequest(void) {
+    asm ("mrs r0, cpsr");
+    asm ("bic r0, r0, #0x40");
+    asm ("msr cpsr_c, r0");
+}
+
+void __attribute__((interrupt("ABORT"))) reset(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("UNDEF"))) Interrupt::undefinedInstruction(void) {
+void __attribute__((interrupt("UNDEF"))) undefinedInstruction(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("SWI"))) Interrupt::software(void) {
+void __attribute__((interrupt("SWI"))) software(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("ABORT"))) Interrupt::prefetchAbort(void) {
+void __attribute__((interrupt("ABORT"))) prefetchAbort(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("ABORT"))) Interrupt::dataAbort(void) {
+void __attribute__((interrupt("ABORT"))) dataAbort(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("IRQ"))) Interrupt::interruptRequest(void) {
+void __attribute__((interrupt("IRQ"))) interruptRequest(void) {
     while (true)
         ;
 }
 
-void __attribute__((interrupt("FIQ"))) Interrupt::fastInterruptRequest(void) {
+void __attribute__((interrupt("FIQ"))) fastInterruptRequest(void) {
     while (true)
         ;
 }

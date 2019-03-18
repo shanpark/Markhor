@@ -17,6 +17,7 @@
  */
 
 #include <cstring>
+#include "Interrupt.h"
 #include "Gpio.h"
 #include "Console.h"
 #include "CLib.h"
@@ -25,8 +26,12 @@
 void Markhor(void) {
     gpio.selectFunction(16, GpioPinFunction::Output);
 
-    if (console.init() == ResultCode::Success) // if successful
+    if (console.init() == ResultCode::Success) {
+        console.write("OK\n", 3);
         gpio.clearOutputPin(16); // turn LED on.
+    }
+
+    enableInterruptRequest();
 
     // for (int inx = 0 ; inx < 67 ; inx++) {
     //     for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
@@ -50,7 +55,8 @@ void Markhor(void) {
     // printTemperature();
     // testDisplayInfo();
     // testItoa();
-    testSprintf();
+    // testSprintf();
+    dumpIVT();
 }
 
 /**
