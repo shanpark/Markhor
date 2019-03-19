@@ -36,13 +36,19 @@ void Markhor(void) {
     }
 
     interrupt.enableInterruptRequest();
+    interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
     
-    armTimer.setLoad(0x400);
+    armTimer.setLoad(0x800);
     armTimer.setTimerBits(ArmTimer::TimerBits::Bit23);
     armTimer.setPrescale(ArmTimer::Prescale::Prescale256);
     armTimer.enable(true);
-    armTimer.enableInterrupt(true);
+    armTimer.enableInterrupt(true, true);
+    console.write("Timer enabled.\n");
+
+    armTimer.enableFreeRunningCounter(true);
+    armTimer.setFreeRunningCounterScaler(10); // prescale
+    console.write("Free Running Counter enabled.\n");
 
     // for (int inx = 0 ; inx < 67 ; inx++) {
     //     for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)

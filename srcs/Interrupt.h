@@ -45,12 +45,88 @@
 
 class Interrupt {
 public:
+    enum class Source : Uint32 {
+        Gpu0 = 0,
+        Gpu1 = 1,
+        Gpu2 = 2,
+        Gpu3 = 3,
+        Gpu4 = 4,
+        Gpu5 = 5,
+        Gpu6 = 6,
+        Gpu7 = 7,
+        Gpu8 = 8,
+        Gpu9 = 9,
+        Gpu10 = 10,
+        Gpu11 = 11,
+        Gpu12 = 12,
+        Gpu13 = 13,
+        Gpu14 = 14,
+        Gpu15 = 15,
+        Gpu16 = 16,
+        Gpu17 = 17,
+        Gpu18 = 18,
+        Gpu19 = 19,
+        Gpu20 = 20,
+        Gpu21 = 21,
+        Gpu22 = 22,
+        Gpu23 = 23,
+        Gpu24 = 24,
+        Gpu25 = 25,
+        Gpu26 = 26,
+        Gpu27 = 27,
+        Gpu28 = 28,
+        Gpu29 = 29,
+        Gpu30 = 30,
+        Gpu31 = 31,
+        Gpu32 = 32,
+        Gpu33 = 33,
+        Gpu34 = 34,
+        Gpu35 = 35,
+        Gpu36 = 36,
+        Gpu37 = 37,
+        Gpu38 = 38,
+        Gpu39 = 39,
+        Gpu40 = 40,
+        Gpu41 = 41,
+        Gpu42 = 42,
+        Gpu43 = 43,
+        Gpu44 = 44,
+        Gpu45 = 45,
+        Gpu46 = 46,
+        Gpu47 = 47,
+        Gpu48 = 48,
+        Gpu49 = 49,
+        Gpu50 = 50,
+        Gpu51 = 51,
+        Gpu52 = 52,
+        Gpu53 = 53,
+        Gpu54 = 54,
+        Gpu55 = 55,
+        Gpu56 = 56,
+        Gpu57 = 57,
+        Gpu58 = 58,
+        Gpu59 = 59,
+        Gpu60 = 60,
+        Gpu61 = 61,
+        Gpu62 = 62,
+        Gpu63 = 63,
+        Timer = 64,
+        Mailbox = 65,
+        Doorbell0 = 66,
+        Doorbell1 = 67,
+        Gpu0Halted = 68,
+        Gpu1Halted = 69,
+        IllegalAccessType1 = 70,
+        IllegalAccessType0 = 71
+    };
+
     void enableInterruptRequest(void);
     void enableFastInterruptRequest(void);
 
     Uint32 getIrq1();
     Uint32 getIrq2();
     Uint32 getBasicIrq();
+    void setFastInterrupt(bool enable, Source source);
     void enableIrq1(Uint32 bits);
     void enableIrq2(Uint32 bits);
     void enableBasicIrq(Uint32 bits);

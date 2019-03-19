@@ -38,12 +38,16 @@ public:
     Uint32 getValue();
     void setTimerBits(TimerBits bits);
     void setPrescale(Prescale prescale);
-    void enableInterrupt(bool enable);
+    void enableInterrupt(bool enable, bool fast);
     void enable(bool enable);
     void haltDebugMode(bool halt);
+    void clearIrq();
+    void setReload(Uint32 load);
+    Uint32 getPredivider();
+    void setPredivider(Uint32 predivider);
     void enableFreeRunningCounter(bool enable);
     void setFreeRunningCounterScaler(Uint8 scaler);
-    void clearIrq();
+    Uint32 getFreeRunningCounter();
 };
 
 extern ArmTimer armTimer;

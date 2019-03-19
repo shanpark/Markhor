@@ -70,6 +70,20 @@ void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {
 }
 
 void __attribute__((interrupt("FIQ"))) fastInterruptRequestHandler(void) {
-    while (true)
-        ;
+    static int on = 0;
+    char buf[32];
+
+    sprintf(buf, "FIQ Handler:%x \n", armTimer.getFreeRunningCounter());
+    console.write(buf);
+
+    /* Flip the LED */
+    if (on) {
+        gpio.setOutputPin(16);
+        on = 0;
+    } else {
+        gpio.clearOutputPin(16);
+        on = 1;
+    }
+
+    armTimer.clearIrq(); // has effect in fiq.
 }

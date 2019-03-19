@@ -31,7 +31,7 @@
 #define RAW_IRQ                 4
 #define MASKED_IRQ              5
 #define RELOAD                  6
-#define PRE_DIVIDER             7
+#define PREDIVIDER              7
 #define FREE_RUNNING_COUNTER    8
 
 /* Control register bits */
@@ -76,23 +76,33 @@ void ArmTimer::setPrescale(Prescale prescale) {
         armTimerRegister[CONTROL] &= ~(PRESCALE16_BIT | PRESCALE256_BIT);
 }
 
-void ArmTimer::enableInterrupt(bool enable) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    if (enable)
-        armTimerRegister[CONTROL] |= INTERRUPT_ENABLE_BIT;
-    else
-        armTimerRegister[CONTROL] &= ~INTERRUPT_ENABLE_BIT;
-}
-
-void ArmTimer::enable(bool enable) {
+void ArmTimer::enableInterrupt(bool enable, bool fast) {
     volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (enable) {
-        interrupt.enableBasicIrq(IRQ_TIMER); // enable timer irq of the interrupt controller.
-        armTimerRegister[CONTROL] |= ENABLE_BIT; // enable timer.
+        if (fast) {
+            interrupt.setFastInterrupt(true, Interrupt::Source::Timer);
+            interrupt.disableBasicIrq(IRQ_TIMER);
+        } else {
+            interrupt.setFastInterrupt(false, Interrupt::Source::Timer);
+            interrupt.enableBasicIrq(IRQ_TIMER);
+        }
+        armTimerRegister[CONTROL] |= INTERRUPT_ENABLE_BIT;
     } else {
+        interrupt.setFastInterrupt(false, Interrupt::Source::Timer); // disable if Timer is fast interrupt.
         interrupt.disableBasicIrq(IRQ_TIMER); // disable
-        armTimerRegister[CONTROL] &= ~ENABLE_BIT;
+        armTimerRegister[CONTROL] &= ~INTERRUPT_ENABLE_BIT;
     }
+}
+
+/**
+ * enable timer.
+ */
+void ArmTimer::enable(bool enable) {
+    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+    if (enable)
+        armTimerRegister[CONTROL] |= ENABLE_BIT; // enable timer.
+    else
+        armTimerRegister[CONTROL] &= ~ENABLE_BIT;
 }
 
 void ArmTimer::haltDebugMode(bool halt) {
@@ -101,6 +111,26 @@ void ArmTimer::haltDebugMode(bool halt) {
         armTimerRegister[CONTROL] |= DEBUG_HALT_BIT;
     else
         armTimerRegister[CONTROL] &= ~DEBUG_HALT_BIT;
+}
+
+void ArmTimer::clearIrq() {
+    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+    armTimerRegister[IRQ_CLEAR] = 1;
+}
+
+void ArmTimer::setReload(Uint32 reload) {
+    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+    armTimerRegister[RELOAD] = reload;
+}
+
+Uint32 ArmTimer::getPredivider() {
+    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+    return (armTimerRegister[PREDIVIDER] & 0x03ff); // only 10 bits used
+}
+
+void ArmTimer::setPredivider(Uint32 predivider) {
+    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+    armTimerRegister[PREDIVIDER] = (predivider & 0x03ff); // only 10 bits used
 }
 
 void ArmTimer::enableFreeRunningCounter(bool enable) {
@@ -117,7 +147,7 @@ void ArmTimer::setFreeRunningCounterScaler(Uint8 scaler) {
     armTimerRegister[CONTROL] |= (((Uint32)scaler) << 16);
 }
 
-void ArmTimer::clearIrq() {
+Uint32 ArmTimer::getFreeRunningCounter() {
     volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    armTimerRegister[IRQ_CLEAR] = 1; // 
+    return armTimerRegister[FREE_RUNNING_COUNTER];
 }

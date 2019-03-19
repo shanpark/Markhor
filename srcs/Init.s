@@ -24,9 +24,12 @@
 .equ    CPSR_MODE_UNDEFINED,    0x1B
 .equ    CPSR_MODE_SYSTEM,       0x1F
 
-.equ    CPSR_IRQ_INHIBIT,       0x80
-.equ    CPSR_FIQ_INHIBIT,       0x40
-.equ    CPSR_THUMB,             0x20
+.equ    STACK_FIQ,              0x1000
+.equ    STACK_IRQ,              0x2000
+.equ    STACK_SVR,              0x8000
+.equ    STACK_ABORT,            0x3000
+.equ    STACK_UNDEFINED,        0x4000
+.equ    STACK_SYSTEM,           0x5000
 
 .section ".init"
 
@@ -35,33 +38,56 @@
  */
 .global _start
 _start:
-    /* initialize interrupt vector table */
+    /**
+     * initialize interrupt vector table
+     */
     mov r0, #0x8000 
     add r0, #_interruptVectorTable
     mov r1, #0x0000
     ldmia r0!, { r2, r3, r4, r5, r6, r7, r8, r9 } /* copy vector entries: 8 words */
     stmia r1!, { r2, r3, r4, r5, r6, r7, r8, r9 }
-    ldmia r0!, { r2, r3, r4, r5, r6, r7, r8 } /* copy handler addresses: 7 words */
+    ldmia r0!, { r2, r3, r4, r5, r6, r7, r8 } /* copy handler pointers: 7 words */
     stmia r1!, { r2, r3, r4, r5, r6, r7, r8 }
 
-    /* initialize stack */
-    /* change mode to interrupt mode */
-    mov r0, #(CPSR_MODE_IRQ | CPSR_IRQ_INHIBIT | CPSR_FIQ_INHIBIT )
+    /**
+     * initialize stack
+     */
+    /* set SVC mode stack pointer */
+    mov sp, #STACK_SVR
+
+    /* save previous mode */
+    mrs r0, cpsr
+    and r1, r0, #0x1f // r1 = previous mode.
+
+    /* change mode to IRQ mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, #CPSR_MODE_IRQ
     msr cpsr_c, r0
 
-    /* set interrupt mode stack pointer */
-    mov sp, #0x4000 
+    /* set IRQ mode stack pointer */
+    mov sp, #STACK_IRQ 
 
-    /* change mode to supervisor mode */
-    mov r0, #(CPSR_MODE_SVR | CPSR_IRQ_INHIBIT | CPSR_FIQ_INHIBIT )
+    /* change mode to FIQ mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, #CPSR_MODE_FIQ
     msr cpsr_c, r0
 
-    mov sp, #0x8000
+    /* set FIQ mode stack pointer */
+    mov sp, #STACK_FIQ 
 
-    /* branch to StartUp */
-    b   StartUp
+    /* restore previous mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, r1 // r1 = previous mode.
+    msr cpsr_c, r0
 
-/* Interrupt Vector Table Entries */
+    /**
+     * branch to StartUp
+     */
+    b StartUp
+
+/**
+ * Interrupt Vector Table Entries
+ */
 _interruptVectorTable:
     ldr pc, resetHandlerPointer
     ldr pc, undefinedInstructionHandlerPointer
@@ -72,7 +98,9 @@ _interruptVectorTable:
     ldr pc, interruptRequestHandlerPointer
     ldr pc, fastInterruptRequestHandlerPointer
 
-/* Interrupt Handler Addresses */
+/**
+ * Interrupt Handler Pointers
+ */
 resetHandlerPointer:                    .word resetHandler
 undefinedInstructionHandlerPointer:     .word undefinedInstructionHandler
 softwareInterruptHandlerPointer:        .word softwareInterruptHandler
