@@ -16,33 +16,24 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONSOLE_H
-#define __CONSOLE_H
+#ifndef __PROCESSOR_H
+#define __PROCESSOR_H
 
-#include "ResultCode.h"
-
-class Console {
-private:
-    class Cursor {
-    public:
-        Cursor() : x(0), y(0) {};
-
-        int x;
-        int y;
+class Processor {
+public:
+    enum class Mode {
+        User        = 0x10,
+        Fiq         = 0x11,
+        Irq         = 0x12,
+        Supervisor  = 0x13,
+        Monitor     = 0x16,
+        Abort       = 0x17,
+        Hyp         = 0x1a,
+        Undefined   = 0x1b,
+        System      = 0x1f
     };
 
-    Cursor cursor;
-    int width, height;
-
-public:
-    ResultCode init();
-    int write(const char * str);
-    int write(const char * str, int length);
-
-private:
-    void gotoNewLine();
+    void changeMode(Mode mode);
 };
 
-extern Console console;
-
-#endif /* __CONSOLE_H */
+#endif /* __PROCESSOR_H */

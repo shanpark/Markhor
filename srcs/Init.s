@@ -15,6 +15,19 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+.equ    CPSR_MODE_USER,         0x10
+.equ    CPSR_MODE_FIQ,          0x11
+.equ    CPSR_MODE_IRQ,          0x12
+.equ    CPSR_MODE_SVR,          0x13
+.equ    CPSR_MODE_ABORT,        0x17
+.equ    CPSR_MODE_UNDEFINED,    0x1B
+.equ    CPSR_MODE_SYSTEM,       0x1F
+
+.equ    CPSR_IRQ_INHIBIT,       0x80
+.equ    CPSR_FIQ_INHIBIT,       0x40
+.equ    CPSR_THUMB,             0x20
+
 .section ".init"
 
 /**
@@ -32,6 +45,17 @@ _start:
     stmia r1!, { r2, r3, r4, r5, r6, r7, r8 }
 
     /* initialize stack */
+    /* change mode to interrupt mode */
+    mov r0, #(CPSR_MODE_IRQ | CPSR_IRQ_INHIBIT | CPSR_FIQ_INHIBIT )
+    msr cpsr_c, r0
+
+    /* set interrupt mode stack pointer */
+    mov sp, #0x4000 
+
+    /* change mode to supervisor mode */
+    mov r0, #(CPSR_MODE_SVR | CPSR_IRQ_INHIBIT | CPSR_FIQ_INHIBIT )
+    msr cpsr_c, r0
+
     mov sp, #0x8000
 
     /* branch to StartUp */
@@ -39,31 +63,20 @@ _start:
 
 /* Interrupt Vector Table Entries */
 _interruptVectorTable:
-    ldr pc, resetAddr
-    ldr pc, undefinedInstructionAddr
-    ldr pc, softwareAddr
-    ldr pc, prefetchAbortAddr
-    ldr pc, dataAbortAddr
+    ldr pc, resetHandlerPointer
+    ldr pc, undefinedInstructionHandlerPointer
+    ldr pc, softwareInterruptHandlerPointer
+    ldr pc, prefetchAbortHandlerPointer
+    ldr pc, dataAbortHandlerPointer
     nop
-    ldr pc, interruptRequestAddr
-    ldr pc, fastInterruptRequestAddr
+    ldr pc, interruptRequestHandlerPointer
+    ldr pc, fastInterruptRequestHandlerPointer
 
 /* Interrupt Handler Addresses */
-resetAddr:                   .word reset
-undefinedInstructionAddr:    .word undefinedInstruction
-softwareAddr:                .word software
-prefetchAbortAddr:           .word prefetchAbort
-dataAbortAddr:               .word dataAbort
-interruptRequestAddr:        .word interruptRequest
-fastInterruptRequestAddr:    .word fastInterruptRequest
-
-@ /**
-@  * enableInterrupts() function definition
-@  */
-@ .global _enableInterruptRequest
-@ _enableInterruptRequest:
-@     mrs r0, cpsr
-@     bic r0, r0, #0x80
-@     msr cpsr_c, r0
-
-@     mov pc, lr
+resetHandlerPointer:                    .word resetHandler
+undefinedInstructionHandlerPointer:     .word undefinedInstructionHandler
+softwareInterruptHandlerPointer:        .word softwareInterruptHandler
+prefetchAbortHandlerPointer:            .word prefetchAbortHandler
+dataAbortHandlerPointer:                .word dataAbortHandler
+interruptRequestHandlerPointer:         .word interruptRequestHandler
+fastInterruptRequestHandlerPointer:     .word fastInterruptRequestHandler

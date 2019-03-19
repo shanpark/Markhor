@@ -16,33 +16,14 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONSOLE_H
-#define __CONSOLE_H
+#include "Processor.h"
 
-#include "ResultCode.h"
-
-class Console {
-private:
-    class Cursor {
-    public:
-        Cursor() : x(0), y(0) {};
-
-        int x;
-        int y;
-    };
-
-    Cursor cursor;
-    int width, height;
-
-public:
-    ResultCode init();
-    int write(const char * str);
-    int write(const char * str, int length);
-
-private:
-    void gotoNewLine();
-};
-
-extern Console console;
-
-#endif /* __CONSOLE_H */
+void Processor::changeMode(Mode mode) {
+    asm (
+        "mrs r2, cpsr\n"
+        "bic r2, r2, #0x1f\n"
+        "orr r2, r2, %[mode]\n"
+        "msr cpsr_c, r2" 
+        :
+        : [mode] "r" (mode));
+}

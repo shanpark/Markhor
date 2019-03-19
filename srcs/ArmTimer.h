@@ -16,33 +16,36 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONSOLE_H
-#define __CONSOLE_H
+#ifndef __ARMTIMER_H
+#define __ARMTIMER_H
 
-#include "ResultCode.h"
+#include "MarkhorTypes.h"
 
-class Console {
-private:
-    class Cursor {
-    public:
-        Cursor() : x(0), y(0) {};
-
-        int x;
-        int y;
+class ArmTimer {
+public:
+    enum class TimerBits {
+        Bit23,
+        Bit16
     };
 
-    Cursor cursor;
-    int width, height;
+    enum class Prescale {
+        NoPrescale,
+        Prescale16,
+        Prescale256
+    };
 
-public:
-    ResultCode init();
-    int write(const char * str);
-    int write(const char * str, int length);
-
-private:
-    void gotoNewLine();
+    void setLoad(Uint32 load);
+    Uint32 getValue();
+    void setTimerBits(TimerBits bits);
+    void setPrescale(Prescale prescale);
+    void enableInterrupt(bool enable);
+    void enable(bool enable);
+    void haltDebugMode(bool halt);
+    void enableFreeRunningCounter(bool enable);
+    void setFreeRunningCounterScaler(Uint8 scaler);
+    void clearIrq();
 };
 
-extern Console console;
+extern ArmTimer armTimer;
 
-#endif /* __CONSOLE_H */
+#endif /* __ARMTIMER_H */

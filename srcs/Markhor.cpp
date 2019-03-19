@@ -22,16 +22,27 @@
 #include "Console.h"
 #include "CLib.h"
 #include "Test.h"
+#include "ArmTimer.h"
+#include "Processor.h"
+
+Processor processor;
 
 void Markhor(void) {
     gpio.selectFunction(16, GpioPinFunction::Output);
 
     if (console.init() == ResultCode::Success) {
-        console.write("OK\n", 3);
+        console.write("Console OK\n");
         gpio.clearOutputPin(16); // turn LED on.
     }
 
-    enableInterruptRequest();
+    interrupt.enableInterruptRequest();
+    console.write("Interrupt enabled.\n");
+    
+    armTimer.setLoad(0x400);
+    armTimer.setTimerBits(ArmTimer::TimerBits::Bit23);
+    armTimer.setPrescale(ArmTimer::Prescale::Prescale256);
+    armTimer.enable(true);
+    armTimer.enableInterrupt(true);
 
     // for (int inx = 0 ; inx < 67 ; inx++) {
     //     for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
@@ -39,7 +50,7 @@ void Markhor(void) {
 
     //     console.write((char *)"New\n", 4);
 
-    //     for (int d = 0 ; d < 1000000 ; d++)
+    //     for (int d = 0 ; d < 2000000 ; d++)
     //         asm ( "NOP" );
     // }
 
@@ -56,7 +67,7 @@ void Markhor(void) {
     // testDisplayInfo();
     // testItoa();
     // testSprintf();
-    dumpIVT();
+    // dumpIVT();
 }
 
 /**

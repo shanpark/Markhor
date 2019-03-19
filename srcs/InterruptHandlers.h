@@ -16,33 +16,17 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONSOLE_H
-#define __CONSOLE_H
+#ifndef __INTERRUPT_HANDLERS_H
+#define __INTERRUPT_HANDLERS_H
 
-#include "ResultCode.h"
+extern "C" {
+    void resetHandler(void) __attribute__((interrupt("ABORT")));
+    void undefinedInstructionHandler(void) __attribute__((interrupt("UNDEF")));
+    void softwareInterruptHandler(void) __attribute__((interrupt("SWI")));
+    void prefetchAbortHandler(void) __attribute__((interrupt("ABORT")));
+    void dataAbortHandler(void) __attribute__((interrupt("ABORT")));
+    void interruptRequestHandler(void) __attribute__((interrupt("IRQ")));
+    void fastInterruptRequestHandler(void) __attribute__((interrupt("FIQ")));
+}
 
-class Console {
-private:
-    class Cursor {
-    public:
-        Cursor() : x(0), y(0) {};
-
-        int x;
-        int y;
-    };
-
-    Cursor cursor;
-    int width, height;
-
-public:
-    ResultCode init();
-    int write(const char * str);
-    int write(const char * str, int length);
-
-private:
-    void gotoNewLine();
-};
-
-extern Console console;
-
-#endif /* __CONSOLE_H */
+#endif /* __INTERRUPT_HANDLERS_H */

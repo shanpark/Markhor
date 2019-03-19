@@ -34,6 +34,26 @@ ResultCode Console::init() {
     return ResultCode::Success;
 }
 
+int Console::write(const char * str) {
+    int inx;
+    for (inx = 0 ; str[inx] != '\0' ; inx++) {
+        if (str[inx] == '\t') {
+            cursor.x = (cursor.x + 8) & 0xfffffff8;
+            if (cursor.x >= width)
+                gotoNewLine();
+        } else if (str[inx] == '\n') {
+                gotoNewLine();
+        } else {
+            textEmul.printCharAt(cursor.x, cursor.y, str[inx], COLOR);
+            cursor.x++;
+            if (cursor.x >= width)
+                gotoNewLine();
+        }
+    }
+
+    return inx;
+}
+
 int Console::write(const char * str, int length) {
     int inx;
     for (inx = 0 ; inx < length ; inx++) {
