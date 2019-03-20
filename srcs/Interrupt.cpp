@@ -21,20 +21,9 @@
 
 #define INTERRUPT_CONTROLLER_BASE   ( IO_PERIPHERALS_BASE + 0xB200 )
 
-#define IRQ_BASIC_PENDING   0
-#define IRQ_PENDIGN_1       1
-#define IRQ_PENDIGN_2       2
-#define FIQ_CONTROL         3
-#define ENABLE_IRQ_1        4
-#define ENABLE_IRQ_2        5
-#define ENABLE_BASIC_IRQ    6
-#define DISABLE_IRQ_1       7
-#define DISABLE_IRQ_2       8
-#define DISABLE_BASIC_IRQ   9
-
-typedef Uint32 InterruptRegister;
-
 Interrupt interrupt;
+
+volatile Interrupt::Register * const Interrupt::interruptRegister = (Interrupt::Register *)INTERRUPT_CONTROLLER_BASE;
 
 void Interrupt::enableInterruptRequest(void) {
     asm ("mrs r0, cpsr");
@@ -48,26 +37,10 @@ void Interrupt::enableFastInterruptRequest(void) {
     asm ("msr cpsr_c, r0");
 }
 
-Uint32 Interrupt::getIrq1() {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    return interruptRegister[IRQ_PENDIGN_1];
-}
-
-Uint32 Interrupt::getIrq2() {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    return interruptRegister[IRQ_PENDIGN_2];
-}
-
-Uint32 Interrupt::getBasicIrq() {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    return interruptRegister[IRQ_BASIC_PENDING];
-}
-
 /**
  * disable has effect only if 'source' is the same as the current value.
  */
 void Interrupt::setFastInterrupt(bool enable, Source source) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
     if (enable) {
         interruptRegister[FIQ_CONTROL] &= ~0xff;
         interruptRegister[FIQ_CONTROL] |= (0x80 | static_cast<Uint32>(source)); // sources bits
@@ -78,52 +51,4 @@ void Interrupt::setFastInterrupt(bool enable, Source source) {
             interruptRegister[FIQ_CONTROL] &= ~0xff; // disable
         }
     }
-}
-
-/**
- * Only '1' bits are enabled and '0' bits have no effect.
- */
-void Interrupt::enableIrq1(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[ENABLE_IRQ_1] = bits;
-}
-
-/**
- * Only '1' bits are enabled and '0' bits have no effect.
- */
-void Interrupt::enableIrq2(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[ENABLE_IRQ_2] = bits;
-}
-
-/**
- * Only '1' bits are enabled and '0' bits have no effect.
- */
-void Interrupt::enableBasicIrq(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[ENABLE_BASIC_IRQ] = bits;
-}
-
-/**
- * Only '1' bits are disabled and '0' bits have no effect.
- */
-void Interrupt::disableIrq1(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[DISABLE_IRQ_1] = bits;
-}
-
-/**
- * Only '1' bits are disabled and '0' bits have no effect.
- */
-void Interrupt::disableIrq2(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[DISABLE_IRQ_2] = bits;
-}
-
-/**
- * Only '1' bits are disabled and '0' bits have no effect.
- */
-void Interrupt::disableBasicIrq(Uint32 bits) {
-    volatile InterruptRegister * interruptRegister = (InterruptRegister *)INTERRUPT_CONTROLLER_BASE;
-    interruptRegister[DISABLE_BASIC_IRQ] = bits;
 }

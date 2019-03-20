@@ -42,6 +42,8 @@ Uint32 Mailbox::buffer[BUFFER_SIZE >> 2] __attribute__((aligned(16)));
 
 Mailbox mailbox;
 
+volatile Mailbox::Register * const Mailbox::mailboxRegister = (Mailbox::Register *)MAILBOX_BASE;
+
 /**
  * Read data from Mailbox.
  * https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
@@ -50,9 +52,7 @@ Mailbox mailbox;
  * @return read data if successful, else -1.
  */
 Uint32 Mailbox::read(MailboxChannel channel) {
-    volatile MailboxRegister * mailboxRegister = (MailboxRegister *)MAILBOX_BASE;
-
-    while (1) {
+    while (true) {
         // wait untile mailbox becomes available
         while ((mailboxRegister[READ_STATUS] & MAIL_EMPTY_BIT) != 0)
             ;
@@ -74,8 +74,6 @@ Uint32 Mailbox::read(MailboxChannel channel) {
  * @param data data to write.
  */
 void Mailbox::write(MailboxChannel channel, Uint32 data) {
-    volatile MailboxRegister * mailboxRegister = (MailboxRegister *)MAILBOX_BASE;
-
     // set channel
     data &= ~(0x0f);
     data |= static_cast<int>(channel);

@@ -20,19 +20,8 @@
 #include "Interrupt.h"
 #include "ArmTimer.h"
 
-/* BCM2385 ARM Peripherals */
+/* BCM2385 ARM Peripherals document */
 #define ARM_TIMER_BASE   (IO_PERIPHERALS_BASE + 0xb400UL)
-
-/* Arm Timer register offsets */
-#define LOAD                    0
-#define VALUE                   1
-#define CONTROL                 2
-#define IRQ_CLEAR               3
-#define RAW_IRQ                 4
-#define MASKED_IRQ              5
-#define RELOAD                  6
-#define PREDIVIDER              7
-#define FREE_RUNNING_COUNTER    8
 
 /* Control register bits */
 #define TIMER_23BIT                         0x00000002
@@ -44,22 +33,11 @@
 #define FREE_RUNNING_COUNTER_ENABLE_BIT     0x00000200
 #define FREE_RUNNING_COUNTER_PRESCALER_BITS 0x00FF0000
 
-typedef Uint32 ArmTimerRegister;
-
 ArmTimer armTimer;
 
-void ArmTimer::setLoad(Uint32 load) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    armTimerRegister[LOAD] = load;
-}
+volatile ArmTimer::Register * const ArmTimer::armTimerRegister = (ArmTimer::Register *)ARM_TIMER_BASE;
 
-Uint32 ArmTimer::getValue() {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    return armTimerRegister[VALUE];
-}
-
-void ArmTimer::setTimerBits(TimerBits bits) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
+void ArmTimer::setTimerBits(TimerBits bits) { 
     if (bits == TimerBits::Bit23)
         armTimerRegister[CONTROL] |= TIMER_23BIT;
     else
@@ -67,7 +45,6 @@ void ArmTimer::setTimerBits(TimerBits bits) {
 }
 
 void ArmTimer::setPrescale(Prescale prescale) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (prescale == Prescale::Prescale16)
         armTimerRegister[CONTROL] |= PRESCALE16_BIT;
     else if (prescale == Prescale::Prescale256)
@@ -77,7 +54,6 @@ void ArmTimer::setPrescale(Prescale prescale) {
 }
 
 void ArmTimer::enableInterrupt(bool enable, bool fast) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (enable) {
         if (fast) {
             interrupt.setFastInterrupt(true, Interrupt::Source::Timer);
@@ -98,7 +74,6 @@ void ArmTimer::enableInterrupt(bool enable, bool fast) {
  * enable timer.
  */
 void ArmTimer::enable(bool enable) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (enable)
         armTimerRegister[CONTROL] |= ENABLE_BIT; // enable timer.
     else
@@ -106,35 +81,13 @@ void ArmTimer::enable(bool enable) {
 }
 
 void ArmTimer::haltDebugMode(bool halt) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (halt)
         armTimerRegister[CONTROL] |= DEBUG_HALT_BIT;
     else
         armTimerRegister[CONTROL] &= ~DEBUG_HALT_BIT;
 }
 
-void ArmTimer::clearIrq() {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    armTimerRegister[IRQ_CLEAR] = 1;
-}
-
-void ArmTimer::setReload(Uint32 reload) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    armTimerRegister[RELOAD] = reload;
-}
-
-Uint32 ArmTimer::getPredivider() {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    return (armTimerRegister[PREDIVIDER] & 0x03ff); // only 10 bits used
-}
-
-void ArmTimer::setPredivider(Uint32 predivider) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    armTimerRegister[PREDIVIDER] = (predivider & 0x03ff); // only 10 bits used
-}
-
 void ArmTimer::enableFreeRunningCounter(bool enable) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     if (enable)
         armTimerRegister[CONTROL] |= FREE_RUNNING_COUNTER_ENABLE_BIT;
     else
@@ -142,12 +95,6 @@ void ArmTimer::enableFreeRunningCounter(bool enable) {
 }
 
 void ArmTimer::setFreeRunningCounterScaler(Uint8 scaler) {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
     armTimerRegister[CONTROL] &= 0xff00ffff;
     armTimerRegister[CONTROL] |= (((Uint32)scaler) << 16);
-}
-
-Uint32 ArmTimer::getFreeRunningCounter() {
-    volatile ArmTimerRegister * armTimerRegister = (ArmTimerRegister *)ARM_TIMER_BASE;
-    return armTimerRegister[FREE_RUNNING_COUNTER];
 }

@@ -21,6 +21,19 @@
 
 #include "MarkhorTypes.h"
 
+/* Interrupt registers offsets */
+#define IRQ_BASIC_PENDING   0
+#define IRQ_PENDIGN_1       1
+#define IRQ_PENDIGN_2       2
+#define FIQ_CONTROL         3
+#define ENABLE_IRQ_1        4
+#define ENABLE_IRQ_2        5
+#define ENABLE_BASIC_IRQ    6
+#define DISABLE_IRQ_1       7
+#define DISABLE_IRQ_2       8
+#define DISABLE_BASIC_IRQ   9
+
+/* Basic IRQ Pending register bits */
 #define IRQ_TIMER                   (0x01 << 0)
 #define IRQ_MAILBOX                 (0x01 << 1)
 #define IRQ_DOORBELL0               (0x01 << 2)
@@ -43,73 +56,144 @@
 #define IRQ_GPU_IRQ57               (0x01 << 19)
 #define IRQ_GPU_IRQ62               (0x01 << 20)
 
+/* IRQ1 Pending register bits */
+#define GPU0_IRQ0   (1 << 0)
+#define GPU0_IRQ1   (1 << 1)
+#define GPU0_IRQ2   (1 << 2)
+#define GPU0_IRQ3   (1 << 3)
+#define GPU0_IRQ4   (1 << 4)
+#define GPU0_IRQ5   (1 << 5)
+#define GPU0_IRQ6   (1 << 6)
+#define GPU0_IRQ7   (1 << 7)
+#define GPU0_IRQ8   (1 << 8)
+#define GPU0_IRQ9   (1 << 9)
+#define GPU0_IRQ10  (1 << 10)
+#define GPU0_IRQ11  (1 << 11)
+#define GPU0_IRQ12  (1 << 12)
+#define GPU0_IRQ13  (1 << 13)
+#define GPU0_IRQ14  (1 << 14)
+#define GPU0_IRQ15  (1 << 15)
+#define GPU0_IRQ16  (1 << 16)
+#define GPU0_IRQ17  (1 << 17)
+#define GPU0_IRQ18  (1 << 18)
+#define GPU0_IRQ19  (1 << 19)
+#define GPU0_IRQ20  (1 << 20)
+#define GPU0_IRQ21  (1 << 21)
+#define GPU0_IRQ22  (1 << 22)
+#define GPU0_IRQ23  (1 << 23)
+#define GPU0_IRQ24  (1 << 24)
+#define GPU0_IRQ25  (1 << 25)
+#define GPU0_IRQ26  (1 << 26)
+#define GPU0_IRQ27  (1 << 27)
+#define GPU0_IRQ28  (1 << 28)
+#define GPU0_IRQ29  (1 << 29)
+#define GPU0_IRQ30  (1 << 30)
+#define GPU0_IRQ31  (1 << 31)
+
+/* IRQ2 Pending register bits */
+#define GPU1_IRQ0   (1 << 0)
+#define GPU1_IRQ1   (1 << 1)
+#define GPU1_IRQ2   (1 << 2)
+#define GPU1_IRQ3   (1 << 3)
+#define GPU1_IRQ4   (1 << 4)
+#define GPU1_IRQ5   (1 << 5)
+#define GPU1_IRQ6   (1 << 6)
+#define GPU1_IRQ7   (1 << 7)
+#define GPU1_IRQ8   (1 << 8)
+#define GPU1_IRQ9   (1 << 9)
+#define GPU1_IRQ10  (1 << 10)
+#define GPU1_IRQ11  (1 << 11)
+#define GPU1_IRQ12  (1 << 12)
+#define GPU1_IRQ13  (1 << 13)
+#define GPU1_IRQ14  (1 << 14)
+#define GPU1_IRQ15  (1 << 15)
+#define GPU1_IRQ16  (1 << 16)
+#define GPU1_IRQ17  (1 << 17)
+#define GPU1_IRQ18  (1 << 18)
+#define GPU1_IRQ19  (1 << 19)
+#define GPU1_IRQ20  (1 << 20)
+#define GPU1_IRQ21  (1 << 21)
+#define GPU1_IRQ22  (1 << 22)
+#define GPU1_IRQ23  (1 << 23)
+#define GPU1_IRQ24  (1 << 24)
+#define GPU1_IRQ25  (1 << 25)
+#define GPU1_IRQ26  (1 << 26)
+#define GPU1_IRQ27  (1 << 27)
+#define GPU1_IRQ28  (1 << 28)
+#define GPU1_IRQ29  (1 << 29)
+#define GPU1_IRQ30  (1 << 30)
+#define GPU1_IRQ31  (1 << 31)
+
 class Interrupt {
+    typedef Uint32 Register;
+
 public:
+    /* for fast interrupt setting */
     enum class Source : Uint32 {
-        Gpu0 = 0,
-        Gpu1 = 1,
-        Gpu2 = 2,
-        Gpu3 = 3,
-        Gpu4 = 4,
-        Gpu5 = 5,
-        Gpu6 = 6,
-        Gpu7 = 7,
-        Gpu8 = 8,
-        Gpu9 = 9,
-        Gpu10 = 10,
-        Gpu11 = 11,
-        Gpu12 = 12,
-        Gpu13 = 13,
-        Gpu14 = 14,
-        Gpu15 = 15,
-        Gpu16 = 16,
-        Gpu17 = 17,
-        Gpu18 = 18,
-        Gpu19 = 19,
-        Gpu20 = 20,
-        Gpu21 = 21,
-        Gpu22 = 22,
-        Gpu23 = 23,
-        Gpu24 = 24,
-        Gpu25 = 25,
-        Gpu26 = 26,
-        Gpu27 = 27,
-        Gpu28 = 28,
-        Gpu29 = 29,
-        Gpu30 = 30,
-        Gpu31 = 31,
-        Gpu32 = 32,
-        Gpu33 = 33,
-        Gpu34 = 34,
-        Gpu35 = 35,
-        Gpu36 = 36,
-        Gpu37 = 37,
-        Gpu38 = 38,
-        Gpu39 = 39,
-        Gpu40 = 40,
-        Gpu41 = 41,
-        Gpu42 = 42,
-        Gpu43 = 43,
-        Gpu44 = 44,
-        Gpu45 = 45,
-        Gpu46 = 46,
-        Gpu47 = 47,
-        Gpu48 = 48,
-        Gpu49 = 49,
-        Gpu50 = 50,
-        Gpu51 = 51,
-        Gpu52 = 52,
-        Gpu53 = 53,
-        Gpu54 = 54,
-        Gpu55 = 55,
-        Gpu56 = 56,
-        Gpu57 = 57,
-        Gpu58 = 58,
-        Gpu59 = 59,
-        Gpu60 = 60,
-        Gpu61 = 61,
-        Gpu62 = 62,
-        Gpu63 = 63,
+        GpuIrq0 = 0,
+        GpuIrq1 = 1,
+        GpuIrq2 = 2,
+        GpuIrq3 = 3,
+        GpuIrq4 = 4,
+        GpuIrq5 = 5,
+        GpuIrq6 = 6,
+        GpuIrq7 = 7,
+        GpuIrq8 = 8,
+        GpuIrq9 = 9,
+        GpuIrq10 = 10,
+        GpuIrq11 = 11,
+        GpuIrq12 = 12,
+        GpuIrq13 = 13,
+        GpuIrq14 = 14,
+        GpuIrq15 = 15,
+        GpuIrq16 = 16,
+        GpuIrq17 = 17,
+        GpuIrq18 = 18,
+        GpuIrq19 = 19,
+        GpuIrq20 = 20,
+        GpuIrq21 = 21,
+        GpuIrq22 = 22,
+        GpuIrq23 = 23,
+        GpuIrq24 = 24,
+        GpuIrq25 = 25,
+        GpuIrq26 = 26,
+        GpuIrq27 = 27,
+        GpuIrq28 = 28,
+        GpuIrq29 = 29,
+        GpuIrq30 = 30,
+        GpuIrq31 = 31,
+        GpuIrq32 = 32,
+        GpuIrq33 = 33,
+        GpuIrq34 = 34,
+        GpuIrq35 = 35,
+        GpuIrq36 = 36,
+        GpuIrq37 = 37,
+        GpuIrq38 = 38,
+        GpuIrq39 = 39,
+        GpuIrq40 = 40,
+        GpuIrq41 = 41,
+        GpuIrq42 = 42,
+        GpuIrq43 = 43,
+        GpuIrq44 = 44,
+        GpuIrq45 = 45,
+        GpuIrq46 = 46,
+        GpuIrq47 = 47,
+        GpuIrq48 = 48,
+        GpuIrq49 = 49,
+        GpuIrq50 = 50,
+        GpuIrq51 = 51,
+        GpuIrq52 = 52,
+        GpuIrq53 = 53,
+        GpuIrq54 = 54,
+        GpuIrq55 = 55,
+        GpuIrq56 = 56,
+        GpuIrq57 = 57,
+        GpuIrq58 = 58,
+        GpuIrq59 = 59,
+        GpuIrq60 = 60,
+        GpuIrq61 = 61,
+        GpuIrq62 = 62,
+        GpuIrq63 = 63,
         Timer = 64,
         Mailbox = 65,
         Doorbell0 = 66,
@@ -123,16 +207,19 @@ public:
     void enableInterruptRequest(void);
     void enableFastInterruptRequest(void);
 
-    Uint32 getIrq1();
-    Uint32 getIrq2();
-    Uint32 getBasicIrq();
+    Uint32 getIrqPending1() { return interruptRegister[IRQ_PENDIGN_1]; }
+    Uint32 getIrqPending2() { return interruptRegister[IRQ_PENDIGN_2]; }
+    Uint32 getBasicIrqPending()  { return interruptRegister[IRQ_BASIC_PENDING]; }
     void setFastInterrupt(bool enable, Source source);
-    void enableIrq1(Uint32 bits);
-    void enableIrq2(Uint32 bits);
-    void enableBasicIrq(Uint32 bits);
-    void disableIrq1(Uint32 bits);
-    void disableIrq2(Uint32 bits);
-    void disableBasicIrq(Uint32 bits);
+    void enableIrq1(Uint32 bits) { interruptRegister[ENABLE_IRQ_1] = bits; } // Only '1' bits enable IRQs. '0' bits have no effect.
+    void enableIrq2(Uint32 bits) { interruptRegister[ENABLE_IRQ_2] = bits; } // Only '1' bits enable IRQs. '0' bits have no effect.
+    void enableBasicIrq(Uint32 bits) { interruptRegister[ENABLE_BASIC_IRQ] = bits; } // Only '1' bits enable IRQs. '0' bits have no effect.
+    void disableIrq1(Uint32 bits) { interruptRegister[DISABLE_IRQ_1] = bits; } // Only '1' bits disable IRQs. '0' bits have no effect.
+    void disableIrq2(Uint32 bits) { interruptRegister[DISABLE_IRQ_2] = bits; } // Only '1' bits disable IRQs. '0' bits have no effect.
+    void disableBasicIrq(Uint32 bits) { interruptRegister[DISABLE_BASIC_IRQ] = bits; } // Only '1' bits disable IRQs. '0' bits have no effect.
+
+private:
+    static volatile Register * const interruptRegister;
 };
 
 extern Interrupt interrupt;

@@ -17,11 +17,14 @@
  */
 
 #include "ArmTimer.h"
+#include "SystemTimer.h"
 #include "CLib.h"
 #include "Console.h"
 #include "Gpio.h"
 #include "Interrupt.h"
 #include "InterruptHandlers.h"
+
+char buf[256];
 
 void __attribute__((interrupt("ABORT"))) resetHandler(void) {
     while (true)
@@ -50,10 +53,9 @@ void __attribute__((interrupt("ABORT"))) dataAbortHandler(void) {
 
 void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {
     static int on = 0;
-    char buf[32];
 
-    if (interrupt.getBasicIrq() & IRQ_TIMER) {
-        sprintf(buf, "Basic IRQ:%x\n", interrupt.getBasicIrq());
+    if (interrupt.getBasicIrqPending() & IRQ_TIMER) {
+        sprintf(buf, "Basic IRQ:%x\n", interrupt.getBasicIrqPending());
         console.write(buf);
 
         /* Flip the LED */
@@ -66,15 +68,34 @@ void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {
         }
 
         armTimer.clearIrq();
+    } 
+
+    if (interrupt.getBasicIrqPending() & IRQ_IRQ1_REGISTER_PENDING) {
+        if (interrupt.getIrqPending1() & GPU0_IRQ3) {
+            Uint32 counter = systemTimer.getCounterLo();
+            sprintf(buf, "System Timer ch3:%d (%x)\n", counter, interrupt.getIrqPending1());
+            console.write(buf);
+
+            systemTimer.setChannel3Match(counter + 1000000);
+            systemTimer.clearChannel3Irq();
+        }
+    } 
+
+    if (interrupt.getBasicIrqPending() & IRQ_IRQ2_REGISTER_PENDING) {
     }
 }
 
 void __attribute__((interrupt("FIQ"))) fastInterruptRequestHandler(void) {
     static int on = 0;
-    char buf[32];
 
-    sprintf(buf, "FIQ Handler:%x \n", armTimer.getFreeRunningCounter());
+    sprintf(buf, "FIQ ArmTimer Handler:%u \n", armTimer.getFreeRunningCounter());
     console.write(buf);
+
+    // Uint32 counter = systemTimer.getCounterLo();
+    // sprintf(buf, "FIQ System Timer ch3:%u (%x)\n", counter, interrupt.getIrqPending1());
+    // console.write(buf);
+    // systemTimer.setChannel3Match(counter + 1000000);
+    // systemTimer.clearChannel3Irq();
 
     /* Flip the LED */
     if (on) {

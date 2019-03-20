@@ -16,12 +16,25 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __ARMTIMER_H
-#define __ARMTIMER_H
+#ifndef __ARM_TIMER_H
+#define __ARM_TIMER_H
 
 #include "MarkhorTypes.h"
 
+/* ARM timer registers offsets */
+#define LOAD                    0
+#define VALUE                   1
+#define CONTROL                 2
+#define IRQ_CLEAR               3
+#define RAW_IRQ                 4
+#define MASKED_IRQ              5
+#define RELOAD                  6
+#define PREDIVIDER              7
+#define FREE_RUNNING_COUNTER    8
+
 class ArmTimer {
+    typedef Uint32 Register;
+
 public:
     enum class TimerBits {
         Bit23,
@@ -34,22 +47,26 @@ public:
         Prescale256
     };
 
-    void setLoad(Uint32 load);
-    Uint32 getValue();
+    void setLoad(Uint32 load) { armTimerRegister[LOAD] = load; }
+    Uint32 getValue() { return armTimerRegister[VALUE]; }
     void setTimerBits(TimerBits bits);
     void setPrescale(Prescale prescale);
     void enableInterrupt(bool enable, bool fast);
     void enable(bool enable);
     void haltDebugMode(bool halt);
-    void clearIrq();
-    void setReload(Uint32 load);
-    Uint32 getPredivider();
-    void setPredivider(Uint32 predivider);
+    void clearIrq() { armTimerRegister[IRQ_CLEAR] = 1; }
+    void setReload(Uint32 reload) { armTimerRegister[RELOAD] = reload; }
+    Uint32 getPredivider() { return (armTimerRegister[PREDIVIDER] & 0x03ff); } // only 10 bits used 
+    void setPredivider(Uint32 predivider) { armTimerRegister[PREDIVIDER] = (predivider & 0x03ff); } // only 10 bits used
     void enableFreeRunningCounter(bool enable);
     void setFreeRunningCounterScaler(Uint8 scaler);
-    Uint32 getFreeRunningCounter();
+    Uint32 getFreeRunningCounter() { return armTimerRegister[FREE_RUNNING_COUNTER]; }
+
+private:
+    static volatile Register * const armTimerRegister;
 };
 
 extern ArmTimer armTimer;
 
-#endif /* __ARMTIMER_H */
+#endif /* __ARM_TIMER_H */
+

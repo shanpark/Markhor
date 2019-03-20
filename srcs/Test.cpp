@@ -23,6 +23,8 @@
 #include "Console.h"
 #include "CLib.h"
 #include "InterruptHandlers.h"
+#include "ArmTimer.h"
+#include "SystemTimer.h"
 #include "Test.h"
 
 // #define WIDTH   1680
@@ -555,14 +557,32 @@ void testItoa() {
 //     console.write(buf, strlen(buf));
 // }
 
-void dumpIVT() {
-    Uint32 * ivt = (Uint32 *)0x0004;
+// void dumpIVT() {
+//     Uint32 * ivt = (Uint32 *)0x0004;
 
-    sprintf(buf, "0x________ 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
-    console.write(buf, strlen(buf));
-    ivt = (Uint32 *)0x0020;
-    sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
-    console.write(buf, strlen(buf));
-    sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", resetHandler, undefinedInstructionHandler, softwareInterruptHandler, prefetchAbortHandler, dataAbortHandler, interruptRequestHandler, fastInterruptRequestHandler);
-    console.write(buf, strlen(buf));
+//     sprintf(buf, "0x________ 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
+//     console.write(buf, strlen(buf));
+//     ivt = (Uint32 *)0x0020;
+//     sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", ivt[0], ivt[1], ivt[2], ivt[3], ivt[4], ivt[5], ivt[6]);
+//     console.write(buf, strlen(buf));
+//     sprintf(buf, "0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", resetHandler, undefinedInstructionHandler, softwareInterruptHandler, prefetchAbortHandler, dataAbortHandler, interruptRequestHandler, fastInterruptRequestHandler);
+//     console.write(buf, strlen(buf));
+// }
+
+void testArmTimer() {
+    armTimer.setLoad(0x800);
+    armTimer.setTimerBits(ArmTimer::TimerBits::Bit23);
+    armTimer.setPrescale(ArmTimer::Prescale::Prescale256);
+    armTimer.enable(true);
+    armTimer.enableInterrupt(true, true);
+    console.write("Timer enabled.\n");
+
+    armTimer.enableFreeRunningCounter(true);
+    armTimer.setFreeRunningCounterScaler(10); // prescale
+    console.write("Free Running Counter enabled.\n");
 }
+
+// void testSystemTimer() {
+//     systemTimer.enableInterrupt(SystemTimer::Channel::Channel3, true, true);
+//     systemTimer.setChannel3Match(systemTimer.getCounterLo() + 1000000); // 1Mhz = 1000000 = 1s
+// }
