@@ -22,29 +22,31 @@
 #include "MarkhorTypes.h"
 #include "ResultCode.h"
 
-enum class GpioPinFunction {
-    Input    = 0,
-    Output   = 1,
-    Alt0     = 4,
-    Alt1     = 5,
-    Alt2     = 6,
-    Alt3     = 7,
-    Alt4     = 3,
-    Alt5     = 2
-};
-
-enum class GpioPinValue {
-    Err  = -1,
-    Lo   = 0,
-    Hi   = 1
-};
-
 class Gpio {
+    typedef Uint32 Register;
+
 public:
-    ResultCode selectFunction(Uint32 pin, GpioPinFunction func);
+    enum class PinFunction {
+        Input    = 0,
+        Output   = 1,
+        Alt0     = 4,
+        Alt1     = 5,
+        Alt2     = 6,
+        Alt3     = 7,
+        Alt4     = 3,
+        Alt5     = 2
+    };
+
+    enum class PinValue {
+        Err  = -1,
+        Lo   = 0,
+        Hi   = 1
+    };
+
+    ResultCode selectFunction(Uint32 pin, PinFunction func);
     ResultCode setOutputPin(Uint32 pin);
     ResultCode clearOutputPin(Uint32 pin);
-    GpioPinValue getPinValue(Uint32 pin);
+    PinValue getPinValue(Uint32 pin);
 };
 
 extern Gpio gpio;

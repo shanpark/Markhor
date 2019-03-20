@@ -22,21 +22,22 @@
 #include "MarkhorTypes.h"
 
 // extern void setupDisplay();
-extern void testPalette();
+// extern void testPalette();
+// extern void testConsole();
 // extern void printFrameBufferInfo();
-extern void printHardwareInfo();
+// extern void printHardwareInfo();
 // extern void printHwMemoryInfo();
 // extern void testClock();
 // extern void printCommandLine();
 // extern void printDmaState();
 // extern void testDevicePower();
 // extern void printVoltageInfo();
-extern void printTemperature();
+// extern void printTemperature();
 // extern void testDisplayInfo();
-extern void testItoa();
+// extern void testItoa();
 // extern void testSprintf();
 // extern void dumpIVT();
-extern void testArmTimer();
-// extern void testSystemTimer();
+// extern void testArmTimer();
+extern void testSystemTimer();
 
 #endif /* __TEST_H */

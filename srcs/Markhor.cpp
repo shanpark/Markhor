@@ -28,7 +28,7 @@
 Processor processor;
 
 void Markhor(void) {
-    gpio.selectFunction(16, GpioPinFunction::Output);
+    gpio.selectFunction(16, Gpio::PinFunction::Output);
 
     if (console.init() == ResultCode::Success) {
         console.write("Console OK\n");
@@ -39,17 +39,8 @@ void Markhor(void) {
     interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
 
-    // for (int inx = 0 ; inx < 67 ; inx++) {
-    //     for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
-    //         console.write((char *)"Hello\tWorld\t", 12);
-
-    //     console.write((char *)"New\n", 4);
-
-    //     for (int d = 0 ; d < 2000000 ; d++)
-    //         asm ( "NOP" );
-    // }
-
     // testPalette();
+    // testConsole();
     // printFrameBufferInfo();
     // printHardwareInfo();
     // printHwMemoryInfo();
@@ -63,8 +54,8 @@ void Markhor(void) {
     // testItoa();
     // testSprintf();
     // dumpIVT();
-    testArmTimer();
-    // testSystemTimer();
+    // testArmTimer();
+    testSystemTimer();
 }
 
 /**

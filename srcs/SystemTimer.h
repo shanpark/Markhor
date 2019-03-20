@@ -36,7 +36,7 @@
 #define C3_IRQ  (1 << 3)
 
 class SystemTimer {
-    typedef Uint32 SystemTimerRegister;
+    typedef Uint32 Register;
 
 public:
     enum class Channel {
@@ -60,7 +60,7 @@ public:
     void setChannel3Match(Uint32 match) { systemTimerRegister[C3] = match; }
 
 private:
-    static volatile SystemTimerRegister * systemTimerRegister;
+    static volatile Register * const systemTimerRegister;
 };
 
 extern SystemTimer systemTimer;

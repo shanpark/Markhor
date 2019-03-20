@@ -55,28 +55,40 @@ static Uint32 temp[256];
 //         gpio.setOutputPin(16);
 // }
 
-void testPalette() {
-    ResultCode result;
-    if (DEPTH == 8) {
-        // result = frameBuffer.setPalette(0, sizeof(palette) / sizeof(Uint32), palette);
-        // if (result == ResultCode::Success)
-        //     sprintf(buf, "Set Palette: Success\n");
-        // else if (result == ResultCode::InvalidParameter)
-        //     sprintf(buf, "Set Palette: Invalid\n");
-        // else
-        //     sprintf(buf, "Set Palette: fail\n");
-        // console.write(buf, strlen(buf));
+// void testPalette() {
+//     ResultCode result;
+//     if (DEPTH == 8) {
+//         result = frameBuffer.setPalette(0, sizeof(palette) / sizeof(Uint32), palette);
+//         if (result == ResultCode::Success)
+//             sprintf(buf, "Set Palette: Success\n");
+//         else if (result == ResultCode::InvalidParameter)
+//             sprintf(buf, "Set Palette: Invalid\n");
+//         else
+//             sprintf(buf, "Set Palette: fail\n");
+//         console.write(buf, strlen(buf));
 
-        // if (frameBuffer.getPalette(temp) == ResultCode::Success) {
-        //     if ((palette[6] == temp[6]) && (palette[7] == temp[7]))
-        //         sprintf(buf, "Get Palette: OK\n");
-        //     else
-        //         sprintf(buf, "Get Palette: NOK [%08X, %08X, %08X, %08X, %08X, %08X, %08X, %08X]\n", temp[8], temp[9], temp[10], temp[11], temp[12], temp[13], temp[14], temp[15]);
-        // } else
-        //     sprintf(buf, "Get Palette: fail\n");
-        // console.write(buf, strlen(buf));
-    }
-}
+//         if (frameBuffer.getPalette(temp) == ResultCode::Success) {
+//             if ((palette[6] == temp[6]) && (palette[7] == temp[7]))
+//                 sprintf(buf, "Get Palette: OK\n");
+//             else
+//                 sprintf(buf, "Get Palette: NOK [%08X, %08X, %08X, %08X, %08X, %08X, %08X, %08X]\n", temp[8], temp[9], temp[10], temp[11], temp[12], temp[13], temp[14], temp[15]);
+//         } else
+//             sprintf(buf, "Get Palette: fail\n");
+//         console.write(buf, strlen(buf));
+//     }
+// }
+
+// void testConsole() {
+//     for (int inx = 0 ; inx < 67 ; inx++) {
+//         for (int jnx = 0 ; jnx < ((inx + 1) % 12) ; jnx++)
+//             console.write((char *)"Hello\tWorld\t", 12);
+
+//         console.write((char *)"New\n", 4);
+
+//         for (int d = 0 ; d < 2000000 ; d++)
+//             asm ( "NOP" );
+//     }
+// }
 
 // void printFrameBufferInfo() {
 //     sprintf(buf, "Frame Buffer Base:%08X, End:%08X, Size:%08X, Bpp:%d, Pitch:%d", frameBuffer.base, frameBuffer.end, frameBuffer.end - frameBuffer.base, frameBuffer.bpp, frameBuffer.pitch);
@@ -86,44 +98,44 @@ void testPalette() {
 //     putString(0, y++, buf, COLOR);
 // }
 
-void printHardwareInfo() {
-    // if (mailboxProperty.getFirmwareRevision(&data) == ResultCode::Success)
-    //     sprintf(buf, "Firmware Revision: %08X\n", data);
-    // else
-    //     sprintf(buf, "Firmware Revision: fail\n");
-    // strcpy(buf, "Firmware Revision: fail\n");
-    // console.write(buf, strlen(buf));
+// void printHardwareInfo() {
+//     if (mailboxProperty.getFirmwareRevision(&data) == ResultCode::Success)
+//         sprintf(buf, "Firmware Revision: %08X\n", data);
+//     else
+//         sprintf(buf, "Firmware Revision: fail\n");
+//     strcpy(buf, "Firmware Revision: fail\n");
+//     console.write(buf, strlen(buf));
 
-    // if (mailboxProperty.getBoardModel(&data) == ResultCode::Success)
-    //     sprintf(buf, "Board Model: %08X\n", data);
-    // else
-    //     sprintf(buf, "Board Model: fail\n");
-    // strcpy(buf, "Firmware Revision: fail\n");
-    // console.write(buf, strlen(buf));
+//     if (mailboxProperty.getBoardModel(&data) == ResultCode::Success)
+//         sprintf(buf, "Board Model: %08X\n", data);
+//     else
+//         sprintf(buf, "Board Model: fail\n");
+//     strcpy(buf, "Firmware Revision: fail\n");
+//     console.write(buf, strlen(buf));
 
-    // if (mailboxProperty.getBoardRevision(&data) == ResultCode::Success)
-    //     sprintf(buf, "Board Revision: %08X\n", data);
-    // else
-    //     sprintf(buf, "Board Revision: fail\n");
-    // strcpy(buf, "Firmware Revision: fail\n");
-    // console.write(buf, strlen(buf));
+//     if (mailboxProperty.getBoardRevision(&data) == ResultCode::Success)
+//         sprintf(buf, "Board Revision: %08X\n", data);
+//     else
+//         sprintf(buf, "Board Revision: fail\n");
+//     strcpy(buf, "Firmware Revision: fail\n");
+//     console.write(buf, strlen(buf));
 
-    // Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    // if (mailboxProperty.getBoardMacAddress(mac) == ResultCode::Success)
-    //     sprintf(buf, "Board MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    // else
-    //     sprintf(buf, "Board MAC Address: fail\n");
-    // strcpy(buf, "Firmware Revision: fail\n");
-    // console.write(buf, strlen(buf));
+//     Uint8 mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+//     if (mailboxProperty.getBoardMacAddress(mac) == ResultCode::Success)
+//         sprintf(buf, "Board MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+//     else
+//         sprintf(buf, "Board MAC Address: fail\n");
+//     strcpy(buf, "Firmware Revision: fail\n");
+//     console.write(buf, strlen(buf));
 
-    // Uint64 data64;
-    // if (mailboxProperty.getBoardSerial(&data64) == ResultCode::Success)
-    //     sprintf(buf, "Board Serial: %llu\n", data64);
-    // else
-    //     sprintf(buf, "Board Serial: fail\n");
-    // strcpy(buf, "Firmware Revision: fail\n");
-    // console.write(buf, strlen(buf));
-}
+//     Uint64 data64;
+//     if (mailboxProperty.getBoardSerial(&data64) == ResultCode::Success)
+//         sprintf(buf, "Board Serial: %llu\n", data64);
+//     else
+//         sprintf(buf, "Board Serial: fail\n");
+//     strcpy(buf, "Firmware Revision: fail\n");
+//     console.write(buf, strlen(buf));
+// }
 
 // void printHwMemoryInfo() {
 //     Address base;
@@ -338,20 +350,20 @@ void printHardwareInfo() {
 //     putString(0, y++, buf, COLOR);
 // }
 
-void printTemperature() {
-    Uint32 temperature;
-    // if (mailboxProperty.getTemperature(0, &temperature) == ResultCode::Success)
-    //     sprintf(buf, "Temperatore: %u\n", temperature);
-    // else
-    //     sprintf(buf, "Temperatore: fail\n");
-    // console.write(buf, strlen(buf));
+// void printTemperature() {
+//     Uint32 temperature;
+//     if (mailboxProperty.getTemperature(0, &temperature) == ResultCode::Success)
+//         sprintf(buf, "Temperatore: %u\n", temperature);
+//     else
+//         sprintf(buf, "Temperatore: fail\n");
+//     console.write(buf, strlen(buf));
 
-    // if (mailboxProperty.getMaxTemperature(0, &temperature) == ResultCode::Success)
-    //     sprintf(buf, "Temperatore Max: %u\n", temperature);
-    // else
-    //     sprintf(buf, "Temperatore Max: fail\n");
-    // console.write(buf, strlen(buf));
-}
+//     if (mailboxProperty.getMaxTemperature(0, &temperature) == ResultCode::Success)
+//         sprintf(buf, "Temperatore Max: %u\n", temperature);
+//     else
+//         sprintf(buf, "Temperatore Max: fail\n");
+//     console.write(buf, strlen(buf));
+// }
 
 // void testDisplayInfo() {
 //     // blankScreen(1);
@@ -434,105 +446,105 @@ void printTemperature() {
 //     putString(0, y++, buf, COLOR);
 // }
 
-void testItoa() {
-    // char buf[8];
+// void testItoa() {
+//     char buf[8];
 
-    // char * p = itoa(1234, buf, 8, 10);
-    // console.write("1234=", 5);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     char * p = itoa(1234, buf, 8, 10);
+//     console.write("1234=", 5);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(-1234, buf, 8, 10);
-    // console.write("-1234=", 6);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(-1234, buf, 8, 10);
+//     console.write("-1234=", 6);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(1234567, buf, 8, 10);
-    // console.write("1234567=", 8);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(1234567, buf, 8, 10);
+//     console.write("1234567=", 8);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(12345678, buf, 8, 10);
-    // console.write("12345678=", 8);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(12345678, buf, 8, 10);
+//     console.write("12345678=", 8);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(-123456, buf, 8, 10);
-    // console.write("-123456=", 8);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(-123456, buf, 8, 10);
+//     console.write("-123456=", 8);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(-1234567, buf, 8, 10);
-    // console.write("-1234567=", 9);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(-1234567, buf, 8, 10);
+//     console.write("-1234567=", 9);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(0x1234, buf, 8, 16);
-    // console.write("1234=", 5);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(0x1234, buf, 8, 16);
+//     console.write("1234=", 5);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(-0x1234, buf, 8, 16);
-    // console.write("-1234=", 6);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(-0x1234, buf, 8, 16);
+//     console.write("-1234=", 6);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(0x1234567, buf, 8, 16);
-    // console.write("1234567=", 8);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(0x1234567, buf, 8, 16);
+//     console.write("1234567=", 8);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(0x12345678, buf, 8, 16);
-    // console.write("12345678=", 9);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1); 
+//     p = itoa(0x12345678, buf, 8, 16);
+//     console.write("12345678=", 9);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1); 
 
-    // p = itoa(-0x123456, buf, 8, 16);
-    // console.write("-123456=", 8);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
+//     p = itoa(-0x123456, buf, 8, 16);
+//     console.write("-123456=", 8);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
 
-    // p = itoa(-0x1234567, buf, 8, 16);
-    // console.write("-1234567=", 9);
-    // if (p)
-    //     console.write(p, strlen(p));
-    // else
-    //     console.write("fail", 4);
-    // console.write("\n", 1);
-}
+//     p = itoa(-0x1234567, buf, 8, 16);
+//     console.write("-1234567=", 9);
+//     if (p)
+//         console.write(p, strlen(p));
+//     else
+//         console.write("fail", 4);
+//     console.write("\n", 1);
+// }
 
 // void testSprintf() {
 //     sprintf(buf, "%%=%c\n", '%');
@@ -569,20 +581,20 @@ void testItoa() {
 //     console.write(buf, strlen(buf));
 // }
 
-void testArmTimer() {
-    armTimer.setLoad(0x800);
-    armTimer.setTimerBits(ArmTimer::TimerBits::Bit23);
-    armTimer.setPrescale(ArmTimer::Prescale::Prescale256);
-    armTimer.enable(true);
-    armTimer.enableInterrupt(true, true);
-    console.write("Timer enabled.\n");
+// void testArmTimer() {
+//     armTimer.setLoad(0x800);
+//     armTimer.setTimerBits(ArmTimer::TimerBits::Bit23);
+//     armTimer.setPrescale(ArmTimer::Prescale::Prescale256);
+//     armTimer.enable(true);
+//     armTimer.enableInterrupt(true, true);
+//     console.write("Timer enabled.\n");
 
-    armTimer.enableFreeRunningCounter(true);
-    armTimer.setFreeRunningCounterScaler(10); // prescale
-    console.write("Free Running Counter enabled.\n");
-}
-
-// void testSystemTimer() {
-//     systemTimer.enableInterrupt(SystemTimer::Channel::Channel3, true, true);
-//     systemTimer.setChannel3Match(systemTimer.getCounterLo() + 1000000); // 1Mhz = 1000000 = 1s
+//     armTimer.enableFreeRunningCounter(true);
+//     armTimer.setFreeRunningCounterScaler(10); // prescale
+//     console.write("Free Running Counter enabled.\n");
 // }
+
+void testSystemTimer() {
+    systemTimer.enableInterrupt(SystemTimer::Channel::Channel3, true, true);
+    systemTimer.setChannel3Match(systemTimer.getCounterLo() + 1000000); // 1Mhz = 1000000 = 1s
+}

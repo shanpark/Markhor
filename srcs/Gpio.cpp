@@ -36,8 +36,6 @@
 #define GPPUD_BASE      (GPIO_BASE + 0x94UL) // GPIO Pin Pull-up/down Enable
 #define GPPUDCLK_BASE   (GPIO_BASE + 0x98UL) // GPIO Pin Pull-up/down Enable Clock
 
-typedef Uint32 GpioRegister;
-
 Gpio gpio;
 
 /**
@@ -47,13 +45,12 @@ Gpio gpio;
  * @param func Function to seelct (0 ~ 7)
  * @return 0 if successful. else -1.
  */
-ResultCode Gpio::selectFunction(Uint32 pin, GpioPinFunction func) {
+ResultCode Gpio::selectFunction(Uint32 pin, PinFunction func) {
     if (pin > 54)
         return ResultCode::InvalidParameter;
 
-
-    GpioRegister * gpfselRegister = &((GpioRegister *)GPFSEL_BASE)[pin / 10];
-    GpioRegister temp = *gpfselRegister;
+    Register * gpfselRegister = &((Register *)GPFSEL_BASE)[pin / 10];
+    Register temp = *gpfselRegister;
     temp &= ~(0x00000007 << ((pin % 10) * 3));
     temp |= (static_cast<Uint32>(func) << ((pin % 10) * 3));
     *gpfselRegister = temp;
@@ -71,7 +68,7 @@ ResultCode Gpio::setOutputPin(Uint32 pin) {
     if (pin > 54)
         return ResultCode::InvalidParameter;
 
-    GpioRegister * gpsetRegister = &((GpioRegister *)GPSET_BASE)[pin / 32];
+    Register * gpsetRegister = &((Register *)GPSET_BASE)[pin / 32];
     *gpsetRegister = 1 << (pin % 32);
 
     return ResultCode::Success;
@@ -87,7 +84,7 @@ ResultCode Gpio::clearOutputPin(Uint32 pin) {
     if (pin > 54)
         return ResultCode::InvalidParameter;
 
-    GpioRegister * gpclrRegister = &((GpioRegister *)GPCLR_BASE)[pin / 32];
+    Register * gpclrRegister = &((Register *)GPCLR_BASE)[pin / 32];
     *gpclrRegister = 1 << (pin % 32);
 
     return ResultCode::Success;
@@ -99,13 +96,13 @@ ResultCode Gpio::clearOutputPin(Uint32 pin) {
  * @param pin Pin number. (0 ~ 53)
  * @return 1 = high, 0 = low. -1 = failure.
  */
-GpioPinValue Gpio::getPinValue(Uint32 pin) {
+Gpio::PinValue Gpio::getPinValue(Uint32 pin) {
     if (pin > 54)
-        return GpioPinValue::Err;
+        return PinValue::Err;
 
-    GpioRegister * gplevRegister = &((GpioRegister *)GPLEV_BASE)[pin / 32];
+    Register * gplevRegister = &((Register *)GPLEV_BASE)[pin / 32];
     if (*gplevRegister & (1 << (pin % 32)))
-        return GpioPinValue::Hi;
+        return PinValue::Hi;
 
-    return GpioPinValue::Lo;
+    return PinValue::Lo;
 }

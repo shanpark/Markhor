@@ -88,14 +88,16 @@ void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {
 void __attribute__((interrupt("FIQ"))) fastInterruptRequestHandler(void) {
     static int on = 0;
 
-    sprintf(buf, "FIQ ArmTimer Handler:%u \n", armTimer.getFreeRunningCounter());
-    console.write(buf);
-
-    // Uint32 counter = systemTimer.getCounterLo();
-    // sprintf(buf, "FIQ System Timer ch3:%u (%x)\n", counter, interrupt.getIrqPending1());
+    // Arm Timer test code
+    // sprintf(buf, "FIQ ArmTimer Handler:%u \n", armTimer.getFreeRunningCounter());
     // console.write(buf);
-    // systemTimer.setChannel3Match(counter + 1000000);
-    // systemTimer.clearChannel3Irq();
+
+    // System Timer test code
+    Uint32 counter = systemTimer.getCounterLo();
+    sprintf(buf, "FIQ System Timer ch3:%u (%x)\n", counter, interrupt.getIrqPending1());
+    console.write(buf);
+    systemTimer.setChannel3Match(counter + 1000000);
+    systemTimer.clearChannel3Irq();
 
     /* Flip the LED */
     if (on) {

@@ -23,12 +23,6 @@
 #include "ResultCode.h"
 
 class TextEmul {
-private:
-    static Uint32 palette[16];
-
-    int width;
-    int height;
-
 public:
     ResultCode setupTextMode();
     int getWidth() { return width; }
@@ -36,6 +30,11 @@ public:
     void printCharAt(Uint32 x, Uint32 y, char ascii, Uint32 color);
     void printStringAt(Uint32 x, Uint32 y, char * str, int length, Uint32 color);
     void scrollUp(int lines);
+
+private:
+    static Uint32 palette[16];
+    int width;
+    int height;
 };
 
 extern TextEmul textEmul;

@@ -25,7 +25,7 @@
 
 SystemTimer systemTimer;
 
-volatile SystemTimer::SystemTimerRegister * SystemTimer::systemTimerRegister = (SystemTimer::SystemTimerRegister *)SYSTEM_TIMER_BASE;
+volatile SystemTimer::Register * const SystemTimer::systemTimerRegister = (SystemTimer::Register *)SYSTEM_TIMER_BASE;
 
 void SystemTimer::enableInterrupt(Channel channel, bool enable, bool fast) {
     Interrupt::Source source;

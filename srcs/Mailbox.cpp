@@ -51,7 +51,7 @@ volatile Mailbox::Register * const Mailbox::mailboxRegister = (Mailbox::Register
  * @param channel target channel
  * @return read data if successful, else -1.
  */
-Uint32 Mailbox::read(MailboxChannel channel) {
+Uint32 Mailbox::read(Channel channel) {
     while (true) {
         // wait untile mailbox becomes available
         while ((mailboxRegister[READ_STATUS] & MAIL_EMPTY_BIT) != 0)
@@ -73,7 +73,7 @@ Uint32 Mailbox::read(MailboxChannel channel) {
  * @param channel target channel
  * @param data data to write.
  */
-void Mailbox::write(MailboxChannel channel, Uint32 data) {
+void Mailbox::write(Channel channel, Uint32 data) {
     // set channel
     data &= ~(0x0f);
     data |= static_cast<int>(channel);

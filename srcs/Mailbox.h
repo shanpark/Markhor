@@ -21,34 +21,33 @@
 
 #include "MarkhorTypes.h"
 
-enum class MailboxChannel {
-    PowerManagement     = 0,
-    FrameBuffer         = 1, // deprecated.
-    VirtualUart         = 2,
-    Vchiq               = 3,
-    Leds                = 4,
-    Buttons             = 5,
-    TouchScreen         = 6,
-    Unused              = 7,
-    PropertyTagsArmToVc = 8,
-    PropertyTagsVcToArm = 9
-};
-
 class Mailbox {
     typedef Uint32 Register;
 
-private:
-#define BUFFER_SIZE  (4 * 512)
-    static Uint32 buffer[BUFFER_SIZE >> 2];
+public:
+    enum class Channel {
+        PowerManagement     = 0,
+        FrameBuffer         = 1, // deprecated.
+        VirtualUart         = 2,
+        Vchiq               = 3,
+        Leds                = 4,
+        Buttons             = 5,
+        TouchScreen         = 6,
+        Unused              = 7,
+        PropertyTagsArmToVc = 8,
+        PropertyTagsVcToArm = 9
+    };
 
 public:
     Uint32 *lockBuffer() { return buffer; /* TODO should implement lock system. */ }
     void unlockBuffer() { /* TODO should implement lock system. */ }
 
-    Uint32 read(MailboxChannel channel);
-    void write(MailboxChannel channel, Uint32 data);
+    Uint32 read(Channel channel);
+    void write(Channel channel, Uint32 data);
 
 private:
+#define BUFFER_SIZE  (4 * 512)
+    static Uint32 buffer[BUFFER_SIZE >> 2];
     static volatile Register * const mailboxRegister;
 };
 
