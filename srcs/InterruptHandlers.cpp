@@ -24,7 +24,7 @@
 #include "Interrupt.h"
 #include "InterruptHandlers.h"
 
-char buf[256];
+static char buf[256];
 
 void __attribute__((interrupt("ABORT"))) resetHandler(void) {
     while (true)

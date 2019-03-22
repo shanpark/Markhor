@@ -23,11 +23,32 @@
 #include "CLib.h"
 #include "Test.h"
 #include "SystemTimer.h"
-#include "Processor.h"
+#include "Mmu.h"
 
-Processor processor;
+extern char buf[512];
+
+#define NUM_PAGE_TABLE_ENTRIES 4096 /* 1 entry per 1MB, so this covers 4G address space */
+#define SDRAM_START       0
+#define SDRAM_END         400
+#define CACHE_DISABLED    0x12
+#define CACHE_WRITEBACK   0x1e
+
+static Uint32 page_table[NUM_PAGE_TABLE_ENTRIES] __attribute__((aligned(16384)));
+
+Mmu mmu;
 
 void Markhor(void) {
+    Uint32 reg;
+    int inx;    
+    for (inx = SDRAM_END ; inx < NUM_PAGE_TABLE_ENTRIES ; inx++)
+        page_table[inx] = inx << 20 | (3 << 10) | CACHE_DISABLED;
+    for (inx = SDRAM_START ; inx < SDRAM_END ; inx++)
+        page_table[inx] = inx << 20 | (3 << 10) | CACHE_WRITEBACK;
+
+    mmu.setTtbr0((Address)page_table);
+    mmu.setAllDomainToClient();
+    mmu.enable();
+
     gpio.selectFunction(16, Gpio::PinFunction::Output);
 
     if (console.init() == ResultCode::Success) {
@@ -38,6 +59,9 @@ void Markhor(void) {
     interrupt.enableInterruptRequest();
     interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
+
+    sprintf(buf, "DACR: %x\n", mmu.getDacr());
+    console.write(buf);
 
     // testPalette();
     // testConsole();

@@ -41,7 +41,7 @@ static Uint32 palette[16] = { // format = 0x00bbggrr
 
 static int y = 0;
 static Uint32 data;
-static char buf[512];
+char buf[512];
 static Uint32 temp[256];
 
 // void setupDisplay() {
@@ -141,17 +141,17 @@ static Uint32 temp[256];
 //     Address base;
 //     Uint64 size;
 
-//     if (getArmMemory(&base, &size) == 0)
-//         sprintf(buf, "ARM Mem Base: 0x%016llX, Size: 0x%016llX", (Uint64)base, size);
+//     if (mailboxProperty.getArmMemory(&base, &size) == ResultCode::Success)
+//         sprintf(buf, "ARM Mem Base: 0x%X, Size: 0x%X\n", (Uint32)base, (Uint32)size);
 //     else
-//         sprintf(buf, "ARM Mem Base: fail, Size: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "ARM Mem Base: fail, Size: fail\n");
+//     console.write(buf);
 
-//     if (getVcMemory(&base, &size) == 0)
-//         sprintf(buf, "VC Mem Base: 0x%016llX, Size: 0x%016llX", (Uint64)base, size);
+//     if (mailboxProperty.getVcMemory(&base, &size) == ResultCode::Success)
+//         sprintf(buf, "VC Mem Base: 0x%X, Size: 0x%X\n", (Uint32)base, (Uint32)size);
 //     else
-//         sprintf(buf, "VC Mem Base: fail, Size: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "VC Mem Base: fail, Size: fail\n");
+//     console.write(buf);
 // }
 
 // void testClock() {
@@ -368,82 +368,85 @@ static Uint32 temp[256];
 // void testDisplayInfo() {
 //     // blankScreen(1);
 
+//     sprintf(buf, "Frame Buffer Base: %x\n", frameBuffer.getBase());
+//     console.write(buf);
+
 //     Uint32 width = 0, height = 0;
-//     if (getPhysicalWH(&width, &height) == 0)
-//         sprintf(buf, "Get Physical WH: [%d, %d]", width, height);
+//     if (frameBuffer.getPhysicalWH(&width, &height) == ResultCode::Success)
+//         sprintf(buf, "Get Physical WH: [%d, %d]\n", width, height);
 //     else
-//         sprintf(buf, "Get Physical WH: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Get Physical WH: fail\n");
+//     console.write(buf);
 
 //     width = 640, height = 480;
-//     if (testPhysicalWH(&width, &height) == 0)
-//         sprintf(buf, "Test Physical WH: [640, 480] -> [%d, %d]", width, height);
+//     if (frameBuffer.testPhysicalWH(&width, &height) == ResultCode::Success)
+//         sprintf(buf, "Test Physical WH: [640, 480] -> [%d, %d]\n", width, height);
 //     else
-//         sprintf(buf, "Test Physical WH: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Test Physical WH: fail\n");
+//     console.write(buf);
 
 //     width = 0, height = 0;
-//     if (getVirtualWH(&width, &height) == 0)
-//         sprintf(buf, "Get Virtual WH: [%d, %d]", width, height);
+//     if (frameBuffer.getVirtualWH(&width, &height) == ResultCode::Success)
+//         sprintf(buf, "Get Virtual WH: [%d, %d]\n", width, height);
 //     else
-//         sprintf(buf, "Get Virtual WH: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Get Virtual WH: fail\n");
+//     console.write(buf);
 
 //     width = 640, height = 480;
-//     if (testVirtualWH(&width, &height) == 0)
-//         sprintf(buf, "Test Virtual WH: [640, 480] -> [%d, %d]", width, height);
+//     if (frameBuffer.testVirtualWH(&width, &height) == ResultCode::Success)
+//         sprintf(buf, "Test Virtual WH: [640, 480] -> [%d, %d]\n", width, height);
 //     else
-//         sprintf(buf, "Test Virtual WH: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Test Virtual WH: fail\n");
+//     console.write(buf);
 
 //     Uint32 depth = 0;
-//     if (getDepth(&depth) == 0)
-//         sprintf(buf, "Get Depth: %d", depth);
+//     if (frameBuffer.getDepth(&depth) == ResultCode::Success)
+//         sprintf(buf, "Get Depth: %d\n", depth);
 //     else
-//         sprintf(buf, "Get Depth: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Get Depth: fail\n");
+//     console.write(buf);
 
 //     depth = 16;
-//     if (testDepth(&depth) == 0)
-//         sprintf(buf, "Test Depth: 16 -> %d", depth);
+//     if (frameBuffer.testDepth(&depth) == ResultCode::Success)
+//         sprintf(buf, "Test Depth: 16 -> %d\n", depth);
 //     else
-//         sprintf(buf, "Test Depth: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Test Depth: fail\n");
+//     console.write(buf);
 
-//     Uint32 pixelOrder = getPixelOrder();
-//     if (pixelOrder != (Uint32)(-1))
-//         sprintf(buf, "Pixel Order: %s", pixelOrder == 0 ? "BGR" : "RGB");
+//     PixelOrder pixelOrder;
+//     if (frameBuffer.getPixelOrder(&pixelOrder) == ResultCode::Success)
+//         sprintf(buf, "Pixel Order: %s\n", pixelOrder == PixelOrder::BGR ? "BGR" : "RGB");
 //     else
-//         sprintf(buf, "Pixel Order: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Pixel Order: fail\n");
+//     console.write(buf);
 
-//     data = getAlphaMode();
+//     data = frameBuffer.getAlphaMode();
 //     if (data != (Uint32)(-1))
-//         sprintf(buf, "Alpha Mode: %u", data);
+//         sprintf(buf, "Alpha Mode: %u\n", data);
 //     else
-//         sprintf(buf, "Alpha Mode: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Alpha Mode: fail\n");
+//     console.write(buf);
 
-//     data = getPitch();
+//     data = frameBuffer.getPitch();
 //     if (data != (Uint32)(-1))
-//         sprintf(buf, "Pitch: %u", data);
+//         sprintf(buf, "Pitch: %u\n", data);
 //     else
-//         sprintf(buf, "Pitch: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Pitch: fail\n");
+//     console.write(buf);
 
 //     Uint32 offX = 0, offY = 0;
-//     if (getVirtualOffset(&offX, &offY) == 0)
-//         sprintf(buf, "Get Virtual Offset: [%d, %d]", offX, offY);
+//     if (frameBuffer.getVirtualOffset(&offX, &offY) == ResultCode::Success)
+//         sprintf(buf, "Get Virtual Offset: [%d, %d]\n", offX, offY);
 //     else
-//         sprintf(buf, "Get Virtual Offset: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Get Virtual Offset: fail\n");
+//     console.write(buf);
 
 //     offX = 16, offY = 16;
-//     if (setVirtualOffset(&offX, &offY) == 0)
-//         sprintf(buf, "Set Virtual Offset: [16, 16] -> [%d, %d]", offX, offY);
+//     if (frameBuffer.setVirtualOffset(&offX, &offY) == ResultCode::Success)
+//         sprintf(buf, "Set Virtual Offset: [16, 16] -> [%d, %d]\n", offX, offY);
 //     else
-//         sprintf(buf, "Set Virtual Offset: fail");
-//     putString(0, y++, buf, COLOR);
+//         sprintf(buf, "Set Virtual Offset: fail\n");
+//     console.write(buf);
 // }
 
 // void testItoa() {
