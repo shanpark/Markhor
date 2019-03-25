@@ -27,28 +27,28 @@
 static char buf[256];
 
 void __attribute__((interrupt("ABORT"))) resetHandler(void) {
-    while (true)
-        ;
+    sprintf(buf, "Reset !\n");
+    console.write(buf);
 }
 
 void __attribute__((interrupt("UNDEF"))) undefinedInstructionHandler(void) {
-    while (true)
-        ;
+    sprintf(buf, "Undefined Instruction !\n");
+    console.write(buf);
 }
 
 void __attribute__((interrupt("SWI"))) softwareInterruptHandler(void) {
-    while (true)
-        ;
+    sprintf(buf, "Software Interrupt !\n");
+    console.write(buf);
 }
 
 void __attribute__((interrupt("ABORT"))) prefetchAbortHandler(void) {
-    while (true)
-        ;
+    sprintf(buf, "Prefetch Abort !\n");
+    console.write(buf);
 }
 
 void __attribute__((interrupt("ABORT"))) dataAbortHandler(void) {
-    while (true)
-        ;
+    sprintf(buf, "Data Abort !\n");
+    console.write(buf);
 }
 
 void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {

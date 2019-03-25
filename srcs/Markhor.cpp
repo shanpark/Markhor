@@ -24,28 +24,29 @@
 #include "Test.h"
 #include "SystemTimer.h"
 #include "Mmu.h"
+#include "TranslationTable.h"
 
 extern char buf[512];
 
 #define NUM_PAGE_TABLE_ENTRIES 4096 /* 1 entry per 1MB, so this covers 4G address space */
 #define SDRAM_START       0
-#define SDRAM_END         400
-#define CACHE_DISABLED    0x12
-#define CACHE_WRITEBACK   0x1e
+#define SDRAM_END         0x190
+#define CACHE_DISABLED    0x02
+#define CACHE_WRITEBACK   0x0e
 
 static Uint32 page_table[NUM_PAGE_TABLE_ENTRIES] __attribute__((aligned(16384)));
 
 Mmu mmu;
 
 void Markhor(void) {
-    Uint32 reg;
-    int inx;    
-    for (inx = SDRAM_END ; inx < NUM_PAGE_TABLE_ENTRIES ; inx++)
-        page_table[inx] = inx << 20 | (3 << 10) | CACHE_DISABLED;
-    for (inx = SDRAM_START ; inx < SDRAM_END ; inx++)
-        page_table[inx] = inx << 20 | (3 << 10) | CACHE_WRITEBACK;
+    TranslationTable tt(page_table);
+    int inx;
+    for (inx = inx ; inx < 0x1c0 ; inx++)
+        tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::Normal, false);
+    for (inx = 0x1c0 ; inx <= 0xfff ; inx++)
+        tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::StronglyOrdered, false);
 
-    mmu.setTtbr0((Address)page_table);
+    mmu.setTtbr0(page_table);
     mmu.setAllDomainToClient();
     mmu.enable();
 
@@ -59,9 +60,6 @@ void Markhor(void) {
     interrupt.enableInterruptRequest();
     interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
-
-    sprintf(buf, "DACR: %x\n", mmu.getDacr());
-    console.write(buf);
 
     // testPalette();
     // testConsole();

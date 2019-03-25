@@ -32,8 +32,8 @@ public:
     }
 
     /* CP15 - c2, TTBR0, TTBR1, TTBCR */
-    void setTtbr0(Address table) { asm volatile("mcr p15, 0, %0, c2, c0, 0" : : "r" (table)); }
-    void setTtbr1(Address table) { asm volatile("mcr p15, 0, %0, c2, c0, 1" : : "r" (table)); }
+    void setTtbr0(Uint32 * table) { asm volatile("mcr p15, 0, %0, c2, c0, 0" : : "r" (table)); }
+    void setTtbr1(Uint32 * table) { asm volatile("mcr p15, 0, %0, c2, c0, 1" : : "r" (table)); }
     
     /* CP15 - c3, Domain Access Control Register. DACR
      * The use of domains is deprecated in the ARMv7 architecture. */
