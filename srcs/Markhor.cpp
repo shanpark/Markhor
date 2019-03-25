@@ -29,19 +29,16 @@
 extern char buf[512];
 
 #define NUM_PAGE_TABLE_ENTRIES 4096 /* 1 entry per 1MB, so this covers 4G address space */
-#define SDRAM_START       0
-#define SDRAM_END         0x190
-#define CACHE_DISABLED    0x02
-#define CACHE_WRITEBACK   0x0e
 
-static Uint32 page_table[NUM_PAGE_TABLE_ENTRIES] __attribute__((aligned(16384)));
+Uint32 page_table[NUM_PAGE_TABLE_ENTRIES] __attribute__((aligned(16384)));
 
 Mmu mmu;
 
 void Markhor(void) {
     TranslationTable tt(page_table);
+
     int inx;
-    for (inx = inx ; inx < 0x1c0 ; inx++)
+    for (inx = 0 ; inx < 1 ; inx++)
         tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::Normal, false);
     for (inx = 0x1c0 ; inx <= 0xfff ; inx++)
         tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::StronglyOrdered, false);
@@ -60,6 +57,12 @@ void Markhor(void) {
     interrupt.enableInterruptRequest();
     interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
+
+    char * pos = (char *)0x000fffff;
+    for ( pos ; pos < (char *)0x00100002 ; pos++) {
+        sprintf(buf, "pos: %x : %cT\n", (Uint32)pos, *pos);
+        console.write(buf);
+    }
 
     // testPalette();
     // testConsole();
