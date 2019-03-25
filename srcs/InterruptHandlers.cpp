@@ -47,8 +47,15 @@ void __attribute__((interrupt("ABORT"))) prefetchAbortHandler(void) {
 }
 
 void __attribute__((interrupt("ABORT"))) dataAbortHandler(void) {
-    while (true)
-        ;
+    Uint32 dfsr, dfar, contextId;
+    asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (dfsr));
+    asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (dfar));
+    asm volatile ("mrc p15, 0, %0, c13, c0, 1" : "=r" (contextId));
+
+    sprintf(buf, "Data Abort[%c]. DFSR:%x, DFAR:%x, PID:%x, ASID:%x\n", dfsr & 0x800 ? "R" : "W", dfsr, dfar, contextId >> 8, contextId & 0xff);
+    console.write(buf);
+
+    gpio.setOutputPin(16);
 }
 
 void __attribute__((interrupt("IRQ"))) interruptRequestHandler(void) {

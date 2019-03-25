@@ -59,6 +59,14 @@ _start:
     mrs r0, cpsr
     and r1, r0, #0x1f // r1 = previous mode.
 
+    /* change mode to FIQ mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, #CPSR_MODE_FIQ
+    msr cpsr_c, r0
+
+    /* set FIQ mode stack pointer */
+    mov sp, #STACK_FIQ 
+
     /* change mode to IRQ mode */
     bic r0, r0, #0x1f
     orr r0, r0, #CPSR_MODE_IRQ
@@ -67,13 +75,29 @@ _start:
     /* set IRQ mode stack pointer */
     mov sp, #STACK_IRQ 
 
-    /* change mode to FIQ mode */
+    /* change mode to Abort mode */
     bic r0, r0, #0x1f
-    orr r0, r0, #CPSR_MODE_FIQ
+    orr r0, r0, #CPSR_MODE_ABORT
     msr cpsr_c, r0
 
-    /* set FIQ mode stack pointer */
-    mov sp, #STACK_FIQ 
+    /* set IRQ mode stack pointer */
+    mov sp, #STACK_ABORT 
+
+    /* change mode to Undefined mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, #CPSR_MODE_UNDEFINED
+    msr cpsr_c, r0
+
+    /* set IRQ mode stack pointer */
+    mov sp, #STACK_UNDEFINED
+
+    /* change mode to System mode */
+    bic r0, r0, #0x1f
+    orr r0, r0, #CPSR_MODE_SYSTEM
+    msr cpsr_c, r0
+
+    /* set IRQ mode stack pointer */
+    mov sp, #STACK_SYSTEM
 
     /* restore previous mode */
     bic r0, r0, #0x1f
