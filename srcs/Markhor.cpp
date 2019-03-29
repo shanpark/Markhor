@@ -17,6 +17,7 @@
  */
 
 #include <cstring>
+#include "Emmc.h"
 #include "Interrupt.h"
 #include "Gpio.h"
 #include "Console.h"
@@ -38,7 +39,7 @@ void Markhor(void) {
     TranslationTable tt(page_table);
 
     int inx;
-    for (inx = 0 ; inx < 1 ; inx++)
+    for (inx = 0 ; inx < 0x1c0 ; inx++)
         tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::Normal, false);
     for (inx = 0x1c0 ; inx <= 0xfff ; inx++)
         tt.map(inx << 20, inx << 20, AccessPermission::Unprivileged, MemoryType::StronglyOrdered, false);
@@ -58,11 +59,17 @@ void Markhor(void) {
     interrupt.enableFastInterruptRequest();
     console.write("Interrupt enabled.\n");
 
-    char * pos = (char *)0x000fffff;
-    for ( pos ; pos < (char *)0x00100002 ; pos++) {
-        sprintf(buf, "pos: %x : %cT\n", (Uint32)pos, *pos);
-        console.write(buf);
+    if (emmc.init() != ResultCode::Success) {
+        console.write("EMMC Module initiailization failed.");
+    } else {
+        console.write("EMMC Module initiailization success.");
     }
+
+    // char * pos = (char *)0x000fffff;
+    // for ( pos ; pos < (char *)0x00100002 ; pos++) {
+    //     sprintf(buf, "pos: %x : %cT\n", (Uint32)pos, *pos);
+    //     console.write(buf);
+    // }
 
     // testPalette();
     // testConsole();
@@ -80,7 +87,7 @@ void Markhor(void) {
     // testSprintf();
     // dumpIVT();
     // testArmTimer();
-    testSystemTimer();
+    // testSystemTimer();
 }
 
 /**

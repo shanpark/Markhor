@@ -16,6 +16,11 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * System Timer
+ * RPi Model B Rev 2 : 1Mhz.
+ */
+
 #ifndef __SYSTEM_TIMER_H
 #define __SYSTEM_TIMER_H
 
@@ -39,6 +44,8 @@ class SystemTimer {
     typedef Uint32 Register;
 
 public:
+    typedef bool (*Condition)();
+
     enum class Channel {
         Channel0    = (1 << 0),
         Channel1    = (1 << 1),
@@ -47,6 +54,7 @@ public:
     };
 
     Uint32 getCounterLo() { return systemTimerRegister[CLO]; }
+    Uint32 getCounterHi() { return systemTimerRegister[CHI]; }
 
     void enableInterrupt(Channel channel, bool enable, bool fast);
 
@@ -59,6 +67,8 @@ public:
     void clearChannel3Irq() { systemTimerRegister[CS] = C3_IRQ; }
     void setChannel3Match(Uint32 match) { systemTimerRegister[C3] = match; }
 
+    void waitUntil(Condition cond, Uint32 timeout);
+    
 private:
     static volatile Register * const systemTimerRegister;
 };

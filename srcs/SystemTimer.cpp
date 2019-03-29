@@ -63,3 +63,18 @@ void SystemTimer::enableInterrupt(Channel channel, bool enable, bool fast) {
         interrupt.disableIrq1(bits);
     }
 }
+
+/**
+ * 
+ */
+void SystemTimer::waitUntil(Condition cond, Uint32 timeout) {
+    Uint32 hi = getCounterHi();
+    Uint32 lo = getCounterLo() + timeout;
+    if (lo < getCounterLo())
+        hi++;
+
+    do {
+        if (cond())
+            break;
+    } while ((getCounterHi() < hi) || (getCounterLo() < lo));
+}
