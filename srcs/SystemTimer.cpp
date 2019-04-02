@@ -67,6 +67,18 @@ void SystemTimer::enableInterrupt(Channel channel, bool enable, bool fast) {
 /**
  * 
  */
+void SystemTimer::wait(Uint32 timeout) {
+    Uint32 hi = getCounterHi();
+    Uint32 lo = getCounterLo() + timeout;
+    if (lo < getCounterLo())
+        hi++;
+    while ((getCounterHi() < hi) || (getCounterLo() < lo))
+        ;
+}
+
+/**
+ * 
+ */
 void SystemTimer::waitUntil(Condition cond, Uint32 timeout) {
     Uint32 hi = getCounterHi();
     Uint32 lo = getCounterLo() + timeout;

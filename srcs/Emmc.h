@@ -30,12 +30,44 @@ public:
 
 private:
     Uint32 getBaseClock();
+    void issueCommand(Uint32 command, Uint32 argument, Uint32 timeout);
+    void issueCommandInt(Uint32 cmd_reg, Uint32 argument, Uint32 timeout);
+    void handleInterrupts();
+    void handleCardInterrupt();
+    int resetDat();
+    int resetCmd();
+    int switchClockRate(Uint32 base_clock, Uint32 target_rate);
+    Uint32 getClockDivider(Uint32 base_clock, Uint32 target_rate);
+
+
     ResultCode powerOnSdCard();
     ResultCode powerOffSdCard();
     ResultCode getPowerState(Uint32 * state);
 
 private:
     static volatile Register * const emmcRegister;
+    static Uint8 internalBuf[1024];
+
+	Uint32 card_supports_sdhc;
+	Uint32 card_supports_18v;
+	Uint32 card_ocr;
+    Uint32 card_rca;
+    Uint32 last_cmd_reg;
+    Uint32 last_cmd;
+    Uint32 last_cmd_success;
+    Uint32 last_r0;
+	Uint32 last_r1;
+	Uint32 last_r2;
+	Uint32 last_r3;
+
+	// int failed_voltage_switch;
+
+	Uint32 last_interrupt;
+	Uint32 last_error;
+    int use_sdma;
+	int card_removal;
+	int blocks_to_transfer;
+	Uint32 block_size;
 
     Uint8 vendor;
     Uint8 sdVersion;

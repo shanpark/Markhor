@@ -67,6 +67,7 @@ public:
     void clearChannel3Irq() { systemTimerRegister[CS] = C3_IRQ; }
     void setChannel3Match(Uint32 match) { systemTimerRegister[C3] = match; }
 
+    void wait(Uint32 timeout);
     void waitUntil(Condition cond, Uint32 timeout);
     
 private:
